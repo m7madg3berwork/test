@@ -1,0 +1,34 @@
+image: samueldebruyn/debian-git
+
+pipelines:
+  branches:
+    master:
+      - step:
+          name: 'Build and Test'
+          script:
+            - echo "Your build and test goes here..."
+      - step:
+          name: 'Lint'
+          script:
+            - echo "Your linting goes here..."
+      - step:
+          name: 'Security scan'
+          script:
+            - echo " Your security scan goes here..."
+      - step:
+          name: 'Deployment to Staging'
+          deployment: staging
+          script:
+            - echo "Please wait while we pushed prepare repo url ....."
+            - git remote add live root@134.209.197.137:/home/romooz/repo/site.git
+            - echo "Please wait while we pushed your code ....."
+            - git push live master --force
+            - echo "Please wait while we install composer ....."
+            - ssh root@134.209.197.137  composer install -d /home/romooz/public_html
+            - echo "Please wait while we running migration ....."
+            # - ssh root@134.209.197.137  php /home/romooz/public_html/artisan migrate --force
+            - echo "Please wait while we giving permissions ....."
+            - ssh root@134.209.197.137  chmod -R 777  /home/romooz/public_html/storage
+            - ssh root@134.209.197.137  chmod -R 777  /home/romooz/public_html/public/uploads
+            - echo "Your deployment to staging script goes here.."
+

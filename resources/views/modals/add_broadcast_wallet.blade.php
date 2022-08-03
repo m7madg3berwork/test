@@ -1,0 +1,30 @@
+<!-- delete Modal -->
+<div id="add-broadcast-wallet-modal" class="modal fade">
+    <div class="modal-dialog modal-lg modal-dialog">
+            @csrf
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title h6">{{translate('send money to user wallet')}}</h4>
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <input type="hidden" name="user_id" id="customer-id">
+                        <div class="form-group mb-3">
+                            <label for="">{{ translate('Amount') }} <span class="text-danger">*</span></label>
+                            <input type="number" class="form-control" placeholder="{{ translate('Enter the amount') }}" id="amount" name="amount" required>
+                        </div>
+                        <div class="form-group mb-3">
+                            <label for="">{{ translate('Description') }}</label>
+                            <textarea name="comment" id="comment" cols="30" rows="10" class="form-control"></textarea>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-body text-center">
+                    <p class="mt-1">{{translate('Are you sure to send money to all')}}</span></p>
+                    <button type="button" class="btn btn-link mt-2" data-dismiss="modal">{{translate('Cancel')}}</button>
+                    <a href="javascript:void(0)" id="sendBroadCast" class="btn btn-primary">{{translate('Send')}}</a>
+                </div>
+            </div>
+    </div>
+</div><!-- /.modal -->

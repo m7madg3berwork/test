@@ -1,0 +1,4 @@
+[23-Jun-2022 00:11:00 Asia/Riyadh] PHP Fatal error:  Allowed memory size of 33554432 bytes exhausted (tried to allocate 778240 bytes) in /home/romooz/public_html/vendor/barryvdh/laravel-debugbar/src/LaravelDebugbar.php on line 874
+[23-Jun-2022 00:11:04 Asia/Riyadh] PHP Fatal error:  Allowed memory size of 33554432 bytes exhausted (tried to allocate 778240 bytes) in /home/romooz/public_html/vendor/barryvdh/laravel-debugbar/src/LaravelDebugbar.php on line 874
+[23-Jun-2022 00:11:22 Asia/Riyadh] PHP Fatal error:  Allowed memory size of 33554432 bytes exhausted (tried to allocate 385024 bytes) in /home/romooz/public_html/vendor/barryvdh/laravel-debugbar/src/Storage/FilesystemStorage.php on line 43
+[23-Jun-2022 00:11:46 Asia/Riyadh] PHP Fatal error:  Allowed memory size of 33554432 bytes exhausted (tried to allocate 630784 bytes) in /home/romooz/public_html/vendor/maximebf/debugbar/src/DebugBar/DataFormatter/DebugBarVarDumper.php on line 311
