@@ -68,36 +68,22 @@ class ProductController extends Controller
 
     public function show($id, Request $request)
     {
-
-        $auth = $request->header('auth');
-        if ($auth && $auth != null) {
-            try {
-
-                $token = PersonalAccessToken::findToken($auth)->first();
-                if (!$token) 'Token not found';
-                $user = $token->tokenable;
-                // if($user)return $user;
-                // else return 'User not found';
-
-            } catch (\Throwable $th) {
-                //throw $th;
-                return response()->json([
-                    'message' => 'User not found',
-                    'code' => 404
-                ]);
-            }
+        // get first address
+        $address = auth()->user()->addresses()->first();
+        if ($address == null) {
+            return response()->json([
+                'message' => 'Address not found',
+                'code' => 404
+            ]);
         }
 
-        $products = Product::where('id', $id)->get();
+        // get products
+        $products = Product::where("id", $id)->get();
 
-        if ($request->header('auth')) {
-        foreach ($products as $key => $product) {
-            $product['zone_price'] = 0;
-            if (count($product->zones) != 0) {
-                $product['zone_price'] = $product->zones->where('zone_id', auth()->user()->city_id)->first()->cost;
-            }
-        }
-        }
+        // get product zone based on address
+        $zone = $products[0]->zones->where("zone_id", $address->zone_id)->first();
+
+        $products[0]->main_price = $zone->cost;
 
         return new ProductDetailCollection($products);
     }
@@ -136,12 +122,12 @@ class ProductController extends Controller
 
         if (count($products) > 0) {
             if ($request->header('auth')) {
-            foreach ($products as $key => $product) {
-                $product['zone_price'] = 0;
-                if (count($product->zones) != 0) {
-                    $product['zone_price'] = $product->zones->where('zone_id', auth()->user()->city_id)->first()->cost;
+                foreach ($products as $key => $product) {
+                    $product['zone_price'] = 0;
+                    if (count($product->zones) != 0) {
+                        $product['zone_price'] = $product->zones->where('zone_id', auth()->user()->city_id)->first()->cost;
+                    }
                 }
-            }
             }
         }
 
@@ -483,7 +469,7 @@ class ProductController extends Controller
         // });
     }
 
-    public function topFromSeller($id , Request $request)
+    public function topFromSeller($id, Request $request)
     {
 
         $auth = $request->header('auth');

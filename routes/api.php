@@ -89,7 +89,7 @@ Route::group(['prefix' => 'v2', 'middleware' => ['app_language']], function () {
     //IIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII
     Route::get('get-admin-packages', 'App\Http\Controllers\Api\V2\PackageController@adminPackages');
     Route::get('get-admin-package/{id}', 'App\Http\Controllers\Api\V2\PackageController@adminPackage')->name('get.admin.package');
-    
+
     Route::post('user/subscribe-package', 'App\Http\Controllers\Api\V2\PackageController@subscribePackage')->middleware('auth:sanctum');
     Route::get('user/subscribed-package-show/{package_id}', 'App\Http\Controllers\Api\V2\PackageController@subscribePackageShow')->middleware('auth:sanctum');
 
@@ -204,7 +204,7 @@ Route::group(['prefix' => 'v2', 'middleware' => ['app_language']], function () {
     Route::get('products/search', 'App\Http\Controllers\Api\V2\ProductController@search');
     Route::get('products/variant/price', 'App\Http\Controllers\Api\V2\ProductController@variantPrice');
     Route::get('products/home', 'App\Http\Controllers\Api\V2\ProductController@home');
-    Route::apiResource('products', 'App\Http\Controllers\Api\V2\ProductController')->except(['store', 'update', 'destroy']);
+    Route::apiResource('products', 'App\Http\Controllers\Api\V2\ProductController')->except(['store', 'update', 'destroy'])->middleware('auth:sanctum');
 
     Route::get('cart-summary', 'App\Http\Controllers\Api\V2\CartController@summary')->middleware('auth:sanctum');
     Route::post('carts/process', 'App\Http\Controllers\Api\V2\CartController@process')->middleware('auth:sanctum');
@@ -270,7 +270,7 @@ Route::group(['prefix' => 'v2', 'middleware' => ['app_language']], function () {
     Route::get('cities-by-state/{state_id}', 'App\Http\Controllers\Api\V2\AddressController@getCitiesByState');
     Route::get('states-by-country/{country_id}', 'App\Http\Controllers\Api\V2\AddressController@getStatesByCountry');
 
-    Route::post('shipping_cost', 'App\Http\Controllers\Api\V2\ShippingController@shipping_cost')->middleware('auth:sanctum');
+    Route::get('shipping_cost/{id}', 'App\Http\Controllers\Api\V2\ShippingController@shipping_cost')->middleware('auth:sanctum');
 
     // Route::post('coupon/apply', 'App\Http\Controllers\Api\V2\CouponController@apply')->middleware('auth:sanctum');
 

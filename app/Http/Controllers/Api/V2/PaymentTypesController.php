@@ -27,19 +27,19 @@ class PaymentTypesController
         if ($list == "online" || $list == "both") {
 
             // if (get_setting('hyperpay_payment') == 1) {
-                $payment_type = array();
-                $payment_type['payment_type'] = 'hyperpay_payment';
-                $payment_type['payment_type_key'] = 'hyperpay';
-                $payment_type['image'] = static_asset('assets/img/cards/hyperpay.png');
-                $payment_type['name'] = "Hyperpay";
-                $payment_type['title'] = "Checkout with Hyperpay";
-                $payment_type['offline_payment_id'] = 0;
-                $payment_type['details'] = "";
-                if ($mode == 'wallet') {
-                    $payment_type['title'] = "Recharge with Hyperpay";
-                }
+            $payment_type = array();
+            $payment_type['payment_type'] = 'hyperpay_payment';
+            $payment_type['payment_type_key'] = 'hyperpay';
+            $payment_type['image'] = static_asset('assets/img/cards/hyperpay.png');
+            $payment_type['name'] = "Hyperpay";
+            $payment_type['title'] = "Checkout with Hyperpay";
+            $payment_type['offline_payment_id'] = 0;
+            $payment_type['details'] = "";
+            if ($mode == 'wallet') {
+                $payment_type['title'] = "Recharge with Hyperpay";
+            }
 
-                $payment_types[] = $payment_type;
+            $payment_types[] = $payment_type;
             // }
 
             // if (get_setting('paypal_payment') == 1) {
@@ -223,18 +223,17 @@ class PaymentTypesController
                 $payment_types[] = $payment_type;
             }
 
-            if (get_setting('cash_payment') == 1) {
-                $payment_type = array();
-                $payment_type['payment_type'] = 'cash_payment';
-                $payment_type['payment_type_key'] = 'cash_on_delivery';
-                $payment_type['image'] = static_asset('assets/img/cards/cod.png');
-                $payment_type['name'] = "Cash Payment";
-                $payment_type['title'] = "Cash on delivery";
-                $payment_type['offline_payment_id'] = 0;
-                $payment_type['details'] = "";
-
-                $payment_types[] = $payment_type;
-            }
+            // if (get_setting('cash_payment') == 1) {
+            //     $payment_type = array();
+            //     $payment_type['payment_type'] = 'cash_payment';
+            //     $payment_type['payment_type_key'] = 'cash_on_delivery';
+            //     $payment_type['image'] = static_asset('assets/img/cards/cod.png');
+            //     $payment_type['name'] = "Cash Payment";
+            //     $payment_type['title'] = "Cash on delivery";
+            //     $payment_type['offline_payment_id'] = 0;
+            //     $payment_type['details'] = "";
+            //     $payment_types[] = $payment_type;
+            // }
         }
 
         if ($mode != 'wallet' && ($list == 'offline' || $list == "both")  && addon_is_activated('offline_payment')) {

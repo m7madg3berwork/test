@@ -30,14 +30,17 @@ class AddressController extends Controller
         $address->country_id = $request->country_id;
         $address->state_id = $request->state_id;
         $address->city_id = $request->city_id;
+        $address->zone_id = $request->zone_id;
         $address->postal_code = $request->postal_code;
         $address->phone = $request->phone;
         $address->save();
 
-        return response()->json([
-            'result' => true,
-            'message' => translate('Shipping information has been added successfully')
-        ]);
+        return new AddressCollection(Address::where('id', $address->id)->get());
+
+        // return response()->json([
+        //     'result' => true,
+        //     'message' => translate('Shipping information has been added successfully')
+        // ]);
     }
 
     public function updateShippingAddress(Request $request)
@@ -47,14 +50,17 @@ class AddressController extends Controller
         $address->country_id = $request->country_id;
         $address->state_id = $request->state_id;
         $address->city_id = $request->city_id;
+        $address->zone_id = $request->zone_id;
         $address->postal_code = $request->postal_code;
         $address->phone = $request->phone;
         $address->save();
 
-        return response()->json([
-            'result' => true,
-            'message' => translate('Shipping information has been updated successfully')
-        ]);
+        return new AddressCollection(Address::where('id', $request->id)->get());
+
+        // return response()->json([
+        //     'result' => true,
+        //     'message' => translate('Shipping information has been updated successfully')
+        // ]);
     }
 
     public function updateShippingAddressLocation(Request $request)
@@ -73,8 +79,8 @@ class AddressController extends Controller
 
     public function deleteShippingAddress($id)
     {
-        $address = Address::where('id',$id)->where('user_id',auth()->user()->id)->first();
-        if($address == null) {
+        $address = Address::where('id', $id)->where('user_id', auth()->user()->id)->first();
+        if ($address == null) {
             return response()->json([
                 'result' => false,
                 'message' => translate('Address not found')
@@ -104,7 +110,6 @@ class AddressController extends Controller
     {
         try {
             Cart::where('user_id', auth()->user()->id)->update(['address_id' => $request->address_id]);
-
         } catch (\Exception $e) {
             return response()->json([
                 'result' => false,
@@ -115,8 +120,6 @@ class AddressController extends Controller
             'result' => true,
             'message' => translate('Address is saved')
         ]);
-
-
     }
 
     public function getCities()
@@ -127,6 +130,10 @@ class AddressController extends Controller
     public function getZones()
     {
         $zones = Zone::all();
+        if (request()->has('city_id')) {
+            $zones = Zone::where("city_id", request('city_id'))
+                ->get();
+        }
         return new ZonesCollection($zones);
     }
 
@@ -139,29 +146,29 @@ class AddressController extends Controller
     {
         $country_query = Country::where('status', 1);
         if ($request->name != "" || $request->name != null) {
-             $country_query->where('name', 'like', '%' . $request->name . '%');
+            $country_query->where('name', 'like', '%' . $request->name . '%');
         }
         $countries = $country_query->get();
-        
+
         return new CountriesCollection($countries);
     }
 
-    public function getCitiesByState($state_id,Request $request)
+    public function getCitiesByState($state_id, Request $request)
     {
-        $city_query = City::where('status', 1)->where('state_id',$state_id);
+        $city_query = City::where('status', 1)->where('state_id', $state_id);
         if ($request->name != "" || $request->name != null) {
-             $city_query->where('name', 'like', '%' . $request->name . '%');
+            $city_query->where('name', 'like', '%' . $request->name . '%');
         }
         $cities = $city_query->get();
         return new CitiesCollection($cities);
     }
 
-    public function getStatesByCountry($country_id,Request $request)
+    public function getStatesByCountry($country_id, Request $request)
     {
-        $state_query = State::where('status', 1)->where('country_id',$country_id);
+        $state_query = State::where('status', 1)->where('country_id', $country_id);
         if ($request->name != "" || $request->name != null) {
             $state_query->where('name', 'like', '%' . $request->name . '%');
-       }
+        }
         $states = $state_query->get();
         return new StatesCollection($states);
     }
