@@ -22,6 +22,15 @@ use App\Utility\NotificationUtility;
 use App\Utility\SendSMSUtility;
 use Carbon\Carbon;
 
+/**
+ * Generate random code to send as OTP
+ */
+function generateOTPCode()
+{
+    return 1234;
+    // return rand(1111, 9999);
+}
+
 //sensSMS function for OTP
 if (!function_exists('sendSMS')) {
     function sendSMS($to, $from, $text, $template_id)
@@ -38,7 +47,6 @@ if (!function_exists('areActiveRoutes')) {
             if (Route::currentRouteName() == $route) {
                 return $output;
             }
-
         }
     }
 }
@@ -51,7 +59,6 @@ if (!function_exists('areActiveRoutesHome')) {
             if (Route::currentRouteName() == $route) {
                 return $output;
             }
-
         }
     }
 }
@@ -603,7 +610,7 @@ if (!function_exists('my_asset')) {
             }
             return app('url')->asset($path, $secure);
 
-//            return app('url')->asset('public/' . $path, $secure);
+            //            return app('url')->asset('public/' . $path, $secure);
         }
     }
 }
@@ -623,7 +630,7 @@ if (!function_exists('static_asset')) {
         }
         return app('url')->asset($path, $secure);
 
-//        return app('url')->asset('public/' . $path, $secure);
+        //        return app('url')->asset('public/' . $path, $secure);
     }
 }
 

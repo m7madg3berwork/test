@@ -5,6 +5,8 @@
 namespace App\Http\Controllers\Api\V2;
 
 use App\Models\BusinessSetting;
+use App\Models\Customer;
+use App\Models\DeliveryBoy;
 use App\Models\User;
 use App\Notifications\AppEmailVerificationNotification;
 use App\Traits\GeneralTrait;
@@ -24,264 +26,150 @@ class AuthController extends Controller
 
     public function signup(Request $request)
     {
-
-        if ($request->customer_type == 'retail') {
-            $validate = Validator($request->all(), [
-                'name' => 'required|string',
-                'email_or_phone' => 'required|string',
-                'register_by' => 'required|string',
-                'customer_type' => 'required|string'
-            ]);
-        } else {
-            $validate = Validator($request->all(), [
-                'name' => 'required|string',
-                'email_or_phone' => 'required|string',
-                'register_by' => 'required|string',
-                'customer_type' => 'required|string',
-                'owner_name' => 'required|string',
-                'commercial_name' => 'required|string',
-                'commercial_registration_no' => 'required',
-                'city_id' => 'required|exists:zones,id',
-                'commercial_registry' => 'required',
-                'tax_number_certificate' => 'required',
-                'long' => 'required',
-                'lat' => 'required'
-            ]);
-        }
-
-
-        if ($validate->fails()) {
-            $code = $this->returnCodeAccordingToInput($validate);
-            return $this->returnValidationError($code, $validate);
-        }
-
-        $code = rand(1111, 9999);
-
-        $ret = '';
-
-        //return $ret;
-
-
-        // return $request;
-
-
-        if (User::where('email', $request->email_or_phone)->orWhere('phone', $request->email_or_phone)->first() != null) {
+        /**
+         * Check if user found
+         */
+        if (
+            User::where('phone', $request->email_or_phone)
+            ->where("user_type", $request->user_type)
+            ->first() != null
+        ) {
             return $this->returnError('404', translate('User already exists.'));
         }
 
+        /**
+         * Create User
+         */
+        if ($request->user_type == 'delivery_boy') {
+            $user = User::create([
+                'name'                   => $request->name,
+                'phone'                  => $request->email_or_phone,
+                'user_type'              => $request->user_type,
+                'active'                 => 0,
+                'delivery_type'          => $request->delivery_type,
+                'zone_id'                => $request->zone_id,
+                'national_id'            => $request->national_id,
+                'national_id_attachment' => $request->national_id_attachment,
+                'national_id_expired'    => $request->national_id_expired,
+                'license_id'             => $request->license_id,
+                'license_id_attachment'  => $request->license_id_attachment,
+                'license_id_expired'     => $request->license_id_expired,
+                'license_car'            => $request->license_car,
+                'license_car_attachment' => $request->license_car_attachment,
+                'license_car_expired'    => $request->license_car_expired
+            ]);
+            DeliveryBoy::create([
+                'user_id' => $user->id
+            ]);
+        } else {
+            // customer
+            if ($request->customer_type == 'retail') {
 
-        // $commercial_registry_name = auth()->user()->commercial_registry ?? null;
-        // $tax_number_certificate_name = auth()->user()->tax_number_certificate ?? null;
+                $code       = generateOTPCode();
+                $userOTP    = 'romooz';
+                $password   = '102030';
+                $sendername = 'ROMOOZ';
+                $text       = $code;
+                $to         = $request->email_or_phone;
 
-        $name1 = auth()->user()->commercial_registry ?? null;
-        $name2 = auth()->user()->tax_number_certificate_name ?? null;
+                /**
+                 * Send OTP
+                 */
+                $url = "http://www.sms4ksa.com/api/sendsms.php?username=$userOTP&password=$password&numbers=$to&message=$text&sender=$sendername&unicode=E&return=json";
+                $c = curl_init();
+                curl_setopt($c, CURLOPT_RETURNTRANSFER, 1);
+                curl_setopt($c, CURLOPT_URL, $url);
+                $contents = curl_exec($c);
+                curl_close($c);
 
-        if ($request->customer_type == 'wholesale') {
-
-            // return base64_encode(file_get_contents($request->file('tax_number_certificate')));
-
-            // $name = time().'.' . explode('/', explode(':', substr( 'data:image/png;base64,'.base64_encode(file_get_contents($request->file('tax_number_certificate'))) , 0, strpos( 'data:image/png;base64,'.base64_encode(file_get_contents($request->file('tax_number_certificate'))) , ';')))[1])[1];
-
-            $name1 = rand() . time() . '.' . explode('/', explode(':', substr($request->commercial_registry, 0, strpos($request->commercial_registry, ';')))[1])[1];
-
-            Image::make($request->commercial_registry)->save(public_path('assets/img/commercial/') . $name1);
-
-            // return $name;
-
-            $name2 = rand() . time() . '.' . explode('/', explode(':', substr($request->tax_number_certificate, 0, strpos($request->tax_number_certificate, ';')))[1])[1];
-
-            Image::make($request->tax_number_certificate)->save(public_path('assets/img/commercial/') . $name2);
-
-
-
-
-            // if ($request->hasFile('commercial_registry')) {
-            //     # Delete Old Image
-            //     // if ($commercial_registry_name != null) {
-            //     //     $this->deleteFile($commercial_registry_name, 'assets/img/commercial/');
-            //     // }
-            //     # Upload New Image & Return its New Name
-            //     $image_name = $this->uploadImage($request->file('commercial_registry'), 'assets/img/commercial/');
-            //     # Save New Name in DB
-            //     $commercial_registry_name = $image_name;
-            // }
-
-            // if ($request->hasFile('tax_number_certificate')) {
-            //     # Delete Old Image
-            //     // if ($tax_number_certificate_name != null) {
-            //     //     $this->deleteFile($tax_number_certificate_name, 'assets/img/commercial/');
-            //     // }
-            //     # Upload New Image & Return its New Name
-            //     $image_name = $this->uploadImage($request->file('tax_number_certificate'), 'assets/img/commercial/');
-            //     # Save New Name in DB
-            //     $tax_number_certificate_name = $image_name;
-            // }
-        }
-
-        // return response()->json([
-        //     'name1' => $name1,
-        //     'name2' => $name2,
-        // ]);
-
-
-        $user = new User([
-            'name' => $request->name,
-            'phone' => $request->email_or_phone,
-            'password' => bcrypt($request->password),
-            'customer_type' => $request->customer_type,
-            'owner_name' => $request->owner_name,
-            'commercial_name' => $request->commercial_name,
-            'commercial_registration_no' => $request->commercial_registration_no,
-            'city_id' => $request->city_id,
-            'verification_code' => $code,
-            'commercial_registry' => $name1,
-            'tax_number_certificate' => $name2,
-            'long' => $request->long ?? null,
-            'lat' => $request->lat ?? null,
-        ]);
-
-        $user->save();
-        // return $user;
-
-        $user->email_verified_at = null;
-        if (BusinessSetting::where('type', 'email_verification')->first()->value != 1) {
-            $user->email_verified_at = date('Y-m-d H:m:s');
-        }
-
-        if ($user->email_verified_at == null) {
-            if ($request->register_by == 'email') {
-                try {
-                    $user->notify(new AppEmailVerificationNotification());
-                } catch (\Exception $e) {
-                }
+                $user = User::create([
+                    'name'              => $request->name,
+                    'phone'             => $request->email_or_phone,
+                    'user_type'         => $request->user_type,
+                    'customer_type'     => $request->customer_type,
+                    'active'            => 1,
+                    'email_verified_at' => null,
+                    'verification_code' => $code
+                ]);
             } else {
-
-                try {
-                    $userOTP = 'romooz';
-                    $password = '102030';
-                    $sendername = 'ROMOOZ';
-                    //  $text = urlencode( $messageContent);
-                    $text = $code;
-                    $to = $request->email_or_phone;
-                    // auth call
-                    $url = "http://www.sms4ksa.com/api/sendsms.php?username=$userOTP&password=$password&numbers=$to&message=$text&sender=$sendername&unicode=E&return=json";
-
-                    $c = curl_init();
-                    curl_setopt($c, CURLOPT_RETURNTRANSFER, 1);
-                    curl_setopt($c, CURLOPT_URL, $url);
-                    $contents = curl_exec($c);
-                    curl_close($c);
-
-                    if ($contents) $ret = $contents;
-                    else return FALSE;
-
-                    $ret = json_decode($ret, true);
-                    // return $ret;
-                    $ret['sent_code'] = $code;
-                    if ($ret['Code'] == 100) {
-                        $ret['status'] = true;
-                    } else {
-                        $ret['status'] = false;
-                    }
-                } catch (\Exception $e) {
-                    return $e;
-                }
+                $user = User::create([
+                    'name'                       => $request->name,
+                    'phone'                      => $request->email_or_phone,
+                    'user_type'                  => $request->user_type,
+                    'customer_type'              => $request->customer_type,
+                    'active'                     => 0,
+                    'owner_name'                 => $request->owner_name,
+                    'commercial_name'            => $request->commercial_name,
+                    'commercial_registration_no' => $request->commercial_registration_no,
+                    'commercial_registry'        => $request->commercial_registry,
+                    'tax_number_certificate'     => $request->tax_number_certificate,
+                    'tax_number'                 => $request->tax_number,
+                    'city_id'                    => $request->city_id,
+                ]);
             }
+            Customer::create([
+                'user_id' => $user->id
+            ]);
         }
-
-        // return $ret;
-        if ($request->customer_type == 'retail') {
-            $user->status = 'done';
-        }
-
-
-        $user->save();
-
-        // return $user;
-
-        //create token
-        $user->createToken('tokens')->plainTextToken;
 
         return response()->json([
             'result' => true,
             'message' => translate('Registration Successful. Please verify and log in to your account.'),
-            'user_id' => $user->id,
-            'otp_ret' => $ret
-        ], 201);
+            'user_id' => $user->id
+        ]);
     }
 
 
 
     public function login(Request $request)
     {
-
         $validate = Validator($request->all(), [
-            'phone' => 'required'
+            'phone'     => 'required',
+            'user_type' => 'required'
         ]);
-
 
         if ($validate->fails()) {
             $code = $this->returnCodeAccordingToInput($validate);
-            return $this->returnValidationError($code, $validate);
+            return $this->returnSValidationError($code, $validate);
         }
 
-        $code = rand(1111, 9999);
-
-        $ret = '';
-
-        $user = User::where('phone', $request->phone)->first();
+        $user = User::where('phone', $request->phone)
+            ->where("user_type", $request->user_type)
+            ->first();
         if (!$user) {
-            if (!$user) {
-                return $this->returnError('404', translate('User not exists.'));
+            return $this->returnError('404', translate('User not exists.'));
+        } else {
+            if ($user->active == 0) {
+                return $this->returnError('404', translate('User not active wait approve from admin.'));
             }
         }
 
-        // $user->email_verified_at = null;
-        // if (BusinessSetting::where('type', 'email_verification')->first()->value != 1) {
-        //     $user->email_verified_at = date('Y-m-d H:m:s');
-        // }
-
-        $userOTP = 'romooz';
-        $password = '102030';
+        $code       = generateOTPCode();
+        $userOTP    = 'romooz';
+        $password   = '102030';
         $sendername = 'ROMOOZ';
-        //  $text = urlencode( $messageContent);
-        $text = $code;
-        $to = $request->phone;
-        // auth call
-        $url = "http://www.sms4ksa.com/api/sendsms.php?username=$userOTP&password=$password&numbers=$to&message=$text&sender=$sendername&unicode=E&return=json";
+        $text       = $code;
+        $to         = $request->phone;
 
+        /**
+         * Send OTP
+         */
+        $url = "http://www.sms4ksa.com/api/sendsms.php?username=$userOTP&password=$password&numbers=$to&message=$text&sender=$sendername&unicode=E&return=json";
         $c = curl_init();
         curl_setopt($c, CURLOPT_RETURNTRANSFER, 1);
         curl_setopt($c, CURLOPT_URL, $url);
         $contents = curl_exec($c);
         curl_close($c);
 
-        if ($contents) $ret = $contents;
-        else return FALSE;
-
-        $ret = json_decode($ret, true);
-        // return $ret;
-        $ret['sent_code'] = $code;
-        if ($ret['Code'] == 100) {
-            $ret['status'] = true;
-        } else {
-            $ret['status'] = false;
-        }
-
-        // if ($request->customer_type == 'retail') {
-        //     $user->status = 'done';
-        // }
-
         $user->email_verified_at = null;
         $user->verification_code = $code;
         $user->save();
 
         return response()->json([
-            'result' => true,
+            'result'  => true,
             'message' => translate('Please verify your account to log in to your account.'),
-            'user_id' => $user->id,
-            'otp_ret' => $ret
-        ], 201);
+            'user_id' => $user->id
+        ]);
     }
 
     public function resendCode(Request $request)
@@ -356,21 +244,17 @@ class AuthController extends Controller
 
         if (!$user) {
             return $this->returnError('404', translate('User not exists.'));
+        } else {
+            if ($user->active == 0) {
+                return $this->returnError('404', translate('User not active wait approve from admin.'));
+            }
         }
 
         if ($user->verification_code == $request->verification_code) {
             $user->email_verified_at = date('Y-m-d H:i:s');
             $user->verification_code = null;
             $user->save();
-
-            // if($user->customer_type == 'retail'){
             return $this->loginSuccess($user);
-            // }
-            // return response()->json([
-            //     'result' => true,
-            //     'message' => translate('Your account is now verified.Please login'),
-            // ], 200);
-
         } else {
             return $this->returnError('404', translate('Code does not match, you can request for resending the code'));
         }

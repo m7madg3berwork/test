@@ -21,9 +21,8 @@ class CustomerController extends Controller
      */
     public function index(Request $request)
     {
-        $users = User::query()->withCount('orders');
+        $users = User::query()->withCount('orders')->whereHas("customer");
         $users = $users->where('user_type', 'customer');
-        $users = $users->where('email_verified_at', '!=', null);
         if (isset($request->customer_type)) {
             $users = $users->where('customer_type', $request->customer_type);
         }
@@ -35,7 +34,6 @@ class CustomerController extends Controller
                 $q->where('name', 'like', '%' . $sort_search . '%')->orWhere('email', 'like', '%' . $sort_search . '%');
             });
         }
-
         $users = $users->paginate(15);
         return view('backend.customer.customers.index', compact('users', 'sort_search'));
     }

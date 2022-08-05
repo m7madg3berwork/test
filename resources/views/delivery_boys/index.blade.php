@@ -16,7 +16,6 @@
     </div>
 </div>
 
-
 <div class="card">
     <div class="card-header d-block d-lg-flex">
         <h5 class="mb-0 h6">{{translate('Delivery Boys')}}</h5>
@@ -24,7 +23,9 @@
             <form class="" id="sort_delivery_boys" action="" method="GET">
                 <div class="box-inline pad-rgt pull-left">
                     <div class="" style="min-width: 250px;">
-                        <input type="text" class="form-control" id="search" name="search"@isset($sort_search) value="{{ $sort_search }}" @endisset placeholder="{{ translate('Type email or name & Enter') }}">
+                        <input type="text" class="form-control" id="search" name="search" @isset($sort_search)
+                            value="{{ $sort_search }}" @endisset
+                            placeholder="{{ translate('Type email or name & Enter') }}">
                     </div>
                 </div>
             </form>
@@ -40,6 +41,7 @@
                     <th data-breakpoints="lg">{{translate('Phone')}}</th>
                     <th>{{translate('Earning')}}</th>
                     <th>{{translate('Collection')}}</th>
+                    <th>{{ translate('Active') }}</th>
                     <th width="10%">{{translate('Options')}}</th>
                 </tr>
             </thead>
@@ -48,7 +50,8 @@
                 @if ($delivery_boy->user != null)
                 <tr>
                     <td>{{ ($key+1) + ($delivery_boys->currentPage() - 1)*$delivery_boys->perPage() }}</td>
-                    <td>@if($delivery_boy->user->banned == 1) <i class="las la-ban text-danger" aria-hidden="true"></i> @endif {{$delivery_boy->user->name}}</td>
+                    <td>@if($delivery_boy->user->banned == 1) <i class="las la-ban text-danger" aria-hidden="true"></i>
+                        @endif {{$delivery_boy->user->name}}</td>
                     <td>{{$delivery_boy->user->email}}</td>
                     <td>{{$delivery_boy->user->phone}}</td>
                     <td>
@@ -58,40 +61,61 @@
                         {{ single_price($delivery_boy->total_collection) }}
                     </td>
                     <td>
+                        <div class="form-check">
+                            <input id="changeActiveUser{{ $delivery_boy->user->id }}"
+                                onchange="changeActive({{ $delivery_boy->user->id }})" class="form-check-input"
+                                type="checkbox" {{ $delivery_boy->user->active == 1 ? '
+                            checked ' : '' }}>
+                        </div>
+                    </td>
+                    <td>
                         <div class="dropdown">
-                            <button type="button" class="btn btn-sm btn-circle btn-soft-primary btn-icon dropdown-toggle no-arrow" data-toggle="dropdown" href="javascript:void(0);" role="button" aria-haspopup="false" aria-expanded="false">
-                              <i class="las la-ellipsis-v"></i>
+                            <button type="button"
+                                class="btn btn-sm btn-circle btn-soft-primary btn-icon dropdown-toggle no-arrow"
+                                data-toggle="dropdown" href="javascript:void(0);" role="button" aria-haspopup="false"
+                                aria-expanded="false">
+                                <i class="las la-ellipsis-v"></i>
                             </button>
                             <div class="dropdown-menu dropdown-menu-right dropdown-menu-xs">
 
-                                <a href="{{route('delivery-boys.edit', $delivery_boy->user->id)}}" class="dropdown-item">
-                                  {{translate('Edit')}}
+                                <a href="{{route('delivery-boys.edit', $delivery_boy->user->id)}}"
+                                    class="dropdown-item">
+                                    {{translate('Edit')}}
                                 </a>
                                 @if($delivery_boy->user->banned != 1)
-                                    <a href="#" onclick="confirm_ban('{{route('delivery-boy.ban', $delivery_boy->user->id)}}');" class="dropdown-item">
-                                        {{translate('Ban this delivery boy')}}
-                                        <i class="fa fa-ban text-danger" aria-hidden="true"></i>
-                                    </a>
+                                <a href="#"
+                                    onclick="confirm_ban('{{route('delivery-boy.ban', $delivery_boy->user->id)}}');"
+                                    class="dropdown-item">
+                                    {{translate('Ban this delivery boy')}}
+                                    <i class="fa fa-ban text-danger" aria-hidden="true"></i>
+                                </a>
                                 @else
-                                    <a href="#" onclick="confirm_unban('{{route('delivery-boy.ban', $delivery_boy->user->id)}}');" class="dropdown-item">
-                                        {{translate('Unban this delivery boy')}}
-                                        <i class="fa fa-check text-success" aria-hidden="true"></i>
-                                    </a>
+                                <a href="#"
+                                    onclick="confirm_unban('{{route('delivery-boy.ban', $delivery_boy->user->id)}}');"
+                                    class="dropdown-item">
+                                    {{translate('Unban this delivery boy')}}
+                                    <i class="fa fa-check text-success" aria-hidden="true"></i>
+                                </a>
                                 @endif
-                                <a href="#" onclick="show_order_collection_modal('{{$delivery_boy->user->id}}');" class="dropdown-item">
+                                <a href="#" onclick="show_order_collection_modal('{{$delivery_boy->user->id}}');"
+                                    class="dropdown-item">
                                     {{translate('Go to Collection')}}
                                 </a>
-                                <a href="#" onclick="show_delivery_earning_modal('{{$delivery_boy->user->id}}');" class="dropdown-item">
+                                <a href="#" onclick="show_delivery_earning_modal('{{$delivery_boy->user->id}}');"
+                                    class="dropdown-item">
                                     {{translate('Go to Payment')}}
                                 </a>
-				{{--
-                                    <a href="#" class="dropdown-item confirm-delete" data-href="{{ route('delivery-boys.destroy', $delivery_boy->user->id) }}" class="">
+                                {{--
+                                <a href="#" class="dropdown-item confirm-delete"
+                                    data-href="{{ route('delivery-boys.destroy', $delivery_boy->user->id) }}" class="">
                                     {{translate('Delete')}}
                                 </a>--}}
                             </div>
                         </div>
-			{{--
-                        <a href="{{route('delivery_boys.login', encrypt($delivery_boy->user->id))}}" class="btn btn-soft-primary btn-icon btn-circle btn-sm" title="{{ translate('Log in as this delivery_boy') }}">
+                        {{--
+                        <a href="{{route('delivery_boys.login', encrypt($delivery_boy->user->id))}}"
+                            class="btn btn-soft-primary btn-icon btn-circle btn-sm"
+                            title="{{ translate('Log in as this delivery_boy') }}">
                             <i class="las la-edit"></i>
                         </a>
                         --}}
@@ -163,16 +187,14 @@
 @endsection
 
 @section('modal')
-    @include('modals.delete_modal')
+@include('modals.delete_modal')
 @endsection
 
 @section('script')
-    <script type="text/javascript">
-
-        (function($) {
-			"use strict";
-        
-        })(jQuery);
+<script type="text/javascript">
+    (function($) {
+		"use strict";
+    })(jQuery);
 		
 		function show_order_collection_modal(id){
             $.post('{{ route('delivery-boy.order-collection') }}',{
@@ -182,32 +204,32 @@
                 $('#collection_modal #collection-modal-content').html(data);
                 $('#collection_modal').modal('show', {backdrop: 'static'});
             });
-        }
+    }
 
-		function show_delivery_earning_modal(id){
-            $.post('{{ route('delivery-boy.delivery-earning') }}',{
-                _token  :'{{ @csrf_token() }}',
-                id      :id
-            }, function(data){
-                $('#payment_modal #payment-modal-content').html(data);
-                $('#payment_modal').modal('show', {backdrop: 'static'});
-            });
-        }
+    function show_delivery_earning_modal(id){
+        $.post('{{ route('delivery-boy.delivery-earning') }}',{
+            _token  :'{{ @csrf_token() }}',
+            id      :id
+        }, function(data){
+            $('#payment_modal #payment-modal-content').html(data);
+            $('#payment_modal').modal('show', {backdrop: 'static'});
+        });
+    }
 
-        function sort_delivery_boys(el){
-            $('#sort_delivery_boys').submit();
-        }
-        function confirm_ban(url)
-        {
-            $('#confirm-ban').modal('show', {backdrop: 'static'});
-            document.getElementById('confirmation').setAttribute('href' , url);
-        }
+    function sort_delivery_boys(el){
+        $('#sort_delivery_boys').submit();
+    }
+    function confirm_ban(url)
+    {
+        $('#confirm-ban').modal('show', {backdrop: 'static'});
+        document.getElementById('confirmation').setAttribute('href' , url);
+    }
 
-        function confirm_unban(url)
-        {
-            $('#confirm-unban').modal('show', {backdrop: 'static'});
-            document.getElementById('confirmationunban').setAttribute('href' , url);
-        }
-
-    </script>
+    function confirm_unban(url)
+    {
+        $('#confirm-unban').modal('show', {backdrop: 'static'});
+        document.getElementById('confirmationunban').setAttribute('href' , url);
+    }
+    
+</script>
 @endsection

@@ -19,76 +19,126 @@ class User extends Authenticatable implements MustVerifyEmail
     }
 
     /**
-    * The attributes that are mass assignable.
-    *
-    * @var array
-    */
+     * The attributes that are mass assignable.
+     *
+     * @var array
+     */
     protected $fillable = [
-        'name', 'email', 'password','type', 'customer_type','owner_name','commercial_name' ,'commercial_registration_no','address', 'city_id' , 'city', 'postal_code', 'phone', 'country', 'provider_id', 'email_verified_at', 'verification_code', 'status' , 'commercial_registry' , 'tax_number_certificate' , 'long' , 'lat', 'zone'
+        'id',
+        'referred_by',
+        'provider_id',
+        'user_type',
+        'active',
+        'name',
+        'email',
+        'email_verified_at',
+        'verification_code',
+        'new_email_verificiation_code',
+        'password',
+        'customer_type',
+        'commercial_registry',
+        'tax_number_certificate',
+        'long',
+        'lat',
+        'owner_name',
+        'tax_number',
+        'commercial_name',
+        'commercial_registration_no',
+        'remember_token',
+        'device_token',
+        'avatar',
+        'avatar_original	',
+        'address',
+        'country',
+        'state',
+        'city',
+        'zone',
+        'city_id',
+        'postal_code',
+        'phone',
+        'balance',
+        'banned',
+        'referral_code',
+        'customer_package_id',
+        'remaining_uploads',
+        'status',
+        'created_at',
+        'updated_at',
+        'delivery_type',
+        'zone_id',
+        'national_id',
+        'national_id_attachment',
+        'national_id_expired',
+        'license_id',
+        'license_id_attachment',
+        'license_id_expired',
+        'license_car',
+        'license_car_attachment',
+        'license_car_expire',
     ];
 
     /**
-    * The attributes that should be hidden for arrays.
-    *
-    * @var array
-    */
+     * The attributes that should be hidden for arrays.
+     *
+     * @var array
+     */
     protected $hidden = [
         'password', 'remember_token',
     ];
 
     public function wishlists()
     {
-    return $this->hasMany(Wishlist::class);
+        return $this->hasMany(Wishlist::class);
     }
 
     public function commercial_photos()
     {
-    return $this->hasMany(CommercialPhotos::class , 'user_id', 'id');
+        return $this->hasMany(CommercialPhotos::class, 'user_id', 'id');
     }
 
     public function customer()
     {
-    return $this->hasOne(Customer::class);
+        return $this->hasOne(Customer::class);
     }
 
     public function affiliate_user()
     {
-    return $this->hasOne(AffiliateUser::class);
+        return $this->hasOne(AffiliateUser::class);
     }
 
     public function affiliate_withdraw_request()
     {
-    return $this->hasMany(AffiliateWithdrawRequest::class);
+        return $this->hasMany(AffiliateWithdrawRequest::class);
     }
 
     public function products()
     {
-    return $this->hasMany(Product::class);
+        return $this->hasMany(Product::class);
     }
 
     public function shop()
     {
-    return $this->hasOne(Shop::class);
+        return $this->hasOne(Shop::class);
     }
 
     public function staff()
     {
-    return $this->hasOne(Staff::class);
+        return $this->hasOne(Staff::class);
     }
 
     public function orders()
     {
-    return $this->hasMany(Order::class);
+        return $this->hasMany(Order::class);
     }
 
     public function wallets()
     {
-    return $this->hasMany(Wallet::class)->orderBy('created_at', 'desc');
+        return $this->hasMany(Wallet::class)->orderBy('created_at', 'desc');
     }
 
     public function club_point()
     {
-    return $this->hasOne(ClubPoint::class);
+        return $this->hasOne(ClubPoint::class);
     }
 
     public function customer_package()
@@ -131,24 +181,28 @@ class User extends Authenticatable implements MustVerifyEmail
         return $this->hasMany(AffiliateLog::class);
     }
 
-    public function product_bids() {
+    public function product_bids()
+    {
         return $this->hasMany(AuctionProductBid::class);
     }
 
 
-    public function packages(){
-        return $this->hasMany(Package::class , 'user_id' , 'id');
-      }
+    public function packages()
+    {
+        return $this->hasMany(Package::class, 'user_id', 'id');
+    }
 
-      public function funds() {
+    public function funds()
+    {
         return $this->hasMany(UserFunds::class);
-      }
+    }
 
-      public function user_packages(){
-        return $this->hasMany(UserPackage::class , 'user_id' , 'id');
-      }
+    public function user_packages()
+    {
+        return $this->hasMany(UserPackage::class, 'user_id', 'id');
+    }
 
-      // Get Image Path
+    // Get Image Path
     public function  getCommercialPathAttribute()
     {
         if ($this->photo != null) {

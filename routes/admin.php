@@ -61,6 +61,13 @@ use App\Http\Controllers\WebsiteController;
   | contains the "web" middleware group. Now create something great!
   |
  */
+
+/**
+ * Change active user
+ */
+Route::post('change/user/active/{userId}/{active}', [AdminController::class, 'changeUserActive'])->name('change_user_active');
+
+
 //Update Routes
 Route::controller(UpdateController::class)->group(function () {
     Route::post('/update', 'step0')->name('update');
@@ -69,7 +76,7 @@ Route::controller(UpdateController::class)->group(function () {
 });
 
 Route::get('/admin', [AdminController::class, 'admin_dashboard'])->name('admin.dashboard')->middleware(['auth', 'admin']);
-Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'admin']], function() {
+Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'admin']], function () {
 
     Route::resource('/offer_daily', OfferDailyController::class);
     Route::get('offer_daily_qty', [OfferDailyController::class, 'setQty'])->name('offer_daily_qty.create');
@@ -139,7 +146,7 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'admin']], function(
         Route::post('/bulk-product-upload', 'bulk_upload')->name('bulk_product_upload');
         Route::get('/product-csv-download/{type}', 'import_product')->name('product_csv.download');
         Route::get('/vendor-product-csv-download/{id}', 'import_vendor_product')->name('import_vendor_product.download');
-        Route::group(['prefix' => 'bulk-upload/download'], function() {
+        Route::group(['prefix' => 'bulk-upload/download'], function () {
             Route::get('/category', 'pdf_download_category')->name('pdf.download_category');
             Route::get('/brand', 'pdf_download_brand')->name('pdf.download_brand');
             Route::get('/seller', 'pdf_download_seller')->name('pdf.download_seller');
@@ -276,7 +283,7 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'admin']], function(
 
 
     // website setting
-    Route::group(['prefix' => 'website'], function() {
+    Route::group(['prefix' => 'website'], function () {
         Route::controller(WebsiteController::class)->group(function () {
             Route::get('/footer', 'footer')->name('website.footer');
             Route::get('/header', 'header')->name('website.header');
@@ -416,7 +423,7 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'admin']], function(
     });
 
     // Product Attribute
-    Route::resource('attributes', AttributeController::class );
+    Route::resource('attributes', AttributeController::class);
     Route::controller(AttributeController::class)->group(function () {
         Route::get('/attributes/edit/{id}', 'edit')->name('attributes.edit');
         Route::get('/attributes/destroy/{id}', 'destroy')->name('attributes.destroy');
@@ -465,7 +472,7 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'admin']], function(
 
     // States
     Route::resource('states', StateController::class);
-	Route::post('/states/status', [StateController::class, 'updateStatus'])->name('states.status');
+    Route::post('/states/status', [StateController::class, 'updateStatus'])->name('states.status');
 
     Route::resource('cities', CityController::class);
     Route::controller(CityController::class)->group(function () {
@@ -474,13 +481,13 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'admin']], function(
         Route::post('/cities/status', 'updateStatus')->name('cities.status');
     });
 
-    Route::resource('zones',ZoneController::class);
+    Route::resource('zones', ZoneController::class);
     Route::controller(ZoneController::class)->group(function () {
         Route::get('/zones/edit/{id}', 'edit')->name('zones.edit');
         Route::get('/zones/destroy/{id}', 'destroy')->name('zones.destroy');
     });
 
-    Route::resource('deliveries',DeliveryController::class);
+    Route::resource('deliveries', DeliveryController::class);
     Route::controller(DeliveryController::class)->group(function () {
         Route::get('/deliveries/edit/{id}', 'edit')->name('deliveries.edit');
         Route::get('/deliveries/destroy/{id}', 'destroy')->name('deliveries.destroy');
