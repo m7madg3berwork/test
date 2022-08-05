@@ -66,26 +66,28 @@ class ProductController extends Controller
         return new ProductMiniCollection($products);
     }
 
-    public function show($id, Request $request)
+    public function show(Request $request, $id)
     {
-        // get first address
-        $address = auth()->user()->addresses()->first();
-        if ($address == null) {
+        try {
+            // get first address
+            $address = auth()->user()->addresses()->first();
+
+            // get products
+            $products = Product::where("id", $id)->get();
+
+            // get product zone based on address
+            $zone = $products[0]->zones->where("zone_id", $address->zone_id)->first();
+
+            // add product cost based on zone
+            $products[0]->main_price = $zone->cost;
+
+            return new ProductDetailCollection($products);
+        } catch (\Exception $e) {
             return response()->json([
-                'message' => 'Address not found',
-                'code' => 404
+                'result'  => false,
+                'message' => translate('This product not allowed in your zone.')
             ]);
         }
-
-        // get products
-        $products = Product::where("id", $id)->get();
-
-        // get product zone based on address
-        $zone = $products[0]->zones->where("zone_id", $address->zone_id)->first();
-
-        $products[0]->main_price = $zone->cost;
-
-        return new ProductDetailCollection($products);
     }
 
     public function admin(Request $request)
