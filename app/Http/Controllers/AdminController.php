@@ -22,6 +22,30 @@ class AdminController extends Controller
                 'active' => $active
             ]);
 
+        /**
+         * send sms to user if active = 1
+         */
+        if ($active == 1) {
+
+            $user = User::find($userId);
+
+            $userOTP    = 'romooz';
+            $password   = '102030';
+            $sendername = 'ROMOOZ';
+            $text       = translate('Your account is activated now you can login.');
+            $to         = $user->phone;
+
+            /**
+             * Send OTP
+             */
+            $url = "http://www.sms4ksa.com/api/sendsms.php?username=$userOTP&password=$password&numbers=$to&message=$text&sender=$sendername&unicode=E&return=json";
+            $c = curl_init();
+            curl_setopt($c, CURLOPT_RETURNTRANSFER, 1);
+            curl_setopt($c, CURLOPT_URL, $url);
+            $contents = curl_exec($c);
+            curl_close($c);
+        }
+
         return response()->json([
             'userId' => $userId,
             'active' => $active
