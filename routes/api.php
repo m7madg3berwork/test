@@ -204,7 +204,10 @@ Route::group(['prefix' => 'v2', 'middleware' => ['app_language']], function () {
     Route::get('products/search', 'App\Http\Controllers\Api\V2\ProductController@search');
     Route::get('products/variant/price', 'App\Http\Controllers\Api\V2\ProductController@variantPrice');
     Route::get('products/home', 'App\Http\Controllers\Api\V2\ProductController@home');
+
     Route::apiResource('products', 'App\Http\Controllers\Api\V2\ProductController')->except(['store', 'update', 'destroy'])->middleware('auth:sanctum');
+
+    Route::get('products/get/{id}', 'App\Http\Controllers\Api\V2\ProductController@getProduct');
 
     Route::get('cart-summary', 'App\Http\Controllers\Api\V2\CartController@summary')->middleware('auth:sanctum');
     Route::post('carts/process', 'App\Http\Controllers\Api\V2\CartController@process')->middleware('auth:sanctum');

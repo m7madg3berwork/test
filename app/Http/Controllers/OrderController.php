@@ -140,19 +140,23 @@ class OrderController extends Controller
 
     public function show($id)
     {
-        $order = Order::findOrFail(decrypt($id));
-        $order_shipping_address = json_decode($order->shipping_address);
+        try {
+            $order = Order::findOrFail(decrypt($id));
+            $order_shipping_address = json_decode($order->shipping_address);
 
-        $query = User::where('user_type', 'delivery_boy');
+            $query = User::where('user_type', 'delivery_boy');
+            if (!empty($order_shipping_address)) {
+                $query->where('city_id', $order_shipping_address->zone_id);
+            }
+            $delivery_boys = $query->get();
 
-        if(!empty($order_shipping_address) && $order_shipping_address->zone_id){
-            $query->where('city_id', $order_shipping_address->zone_id);
+            $order->viewed = 1;
+            $order->save();
+
+            return view('backend.sales.inhouse_orders.show', compact('order', 'delivery_boys', 'order_shipping_address'));
+        } catch (\Exception $e) {
+            return redirect(route('inhouse_orders.index'));
         }
-        $delivery_boys = $query->get();
-
-        $order->viewed = 1;
-        $order->save();
-        return view('backend.sales.inhouse_orders.show', compact('order', 'delivery_boys'));
     }
 
     // Seller Orders
@@ -247,7 +251,7 @@ class OrderController extends Controller
             $order_shipping_address = json_decode($order->shipping_address);
             $query = User::where('user_type', 'delivery_boy');
 
-            if(!empty($order_shipping_address) && $order_shipping_address->zone_id){
+            if (!empty($order_shipping_address) && $order_shipping_address->zone_id) {
                 $query->where('city_id', $order_shipping_address->zone_id);
             }
             $delivery_boys = $query->get();
@@ -259,7 +263,7 @@ class OrderController extends Controller
 
             $query = User::where('user_type', 'delivery_boy');
 
-            if(!empty($order_shipping_address) && $order_shipping_address->zone_id){
+            if (!empty($order_shipping_address) && $order_shipping_address->zone_id) {
                 $query->where('city_id', $order_shipping_address->zone_id);
             }
 
@@ -488,9 +492,7 @@ class OrderController extends Controller
                         $product_stock->qty += $orderDetail->quantity;
                         $product_stock->save();
                     }
-
                 } catch (\Exception $e) {
-
                 }
 
                 $orderDetail->delete();
@@ -579,7 +581,8 @@ class OrderController extends Controller
 
                 if (addon_is_activated('affiliate_system')) {
                     if (($request->status == 'delivered' || $request->status == 'cancelled') &&
-                        $orderDetail->product_referral_code) {
+                        $orderDetail->product_referral_code
+                    ) {
 
                         $no_of_delivered = 0;
                         $no_of_canceled = 0;
@@ -603,14 +606,13 @@ class OrderController extends Controller
             try {
                 SmsUtility::delivery_status_change(json_decode($order->shipping_address)->phone, $order);
             } catch (\Exception $e) {
-
             }
         }
 
         //sends Notifications to user
         NotificationUtility::sendNotification($order, $request->status);
         // send email
-        $userMailData = User::where('id',$order->user_id)->first();
+        $userMailData = User::where('id', $order->user_id)->first();
         if ($userMailData) {
             Notification::send($userMailData, new OrderConformNotification($order));
         }
@@ -699,7 +701,6 @@ class OrderController extends Controller
             try {
                 SmsUtility::payment_status_change(json_decode($order->shipping_address)->phone, $order);
             } catch (\Exception $e) {
-
             }
         }
         return 1;
@@ -738,7 +739,6 @@ class OrderController extends Controller
                 try {
                     Mail::to($order->delivery_boy->email)->queue(new InvoiceEmailManager($array));
                 } catch (\Exception $e) {
-
                 }
             }
 
@@ -746,7 +746,6 @@ class OrderController extends Controller
                 try {
                     SmsUtility::assign_delivery_boy($order->delivery_boy->phone, $order->code);
                 } catch (\Exception $e) {
-
                 }
             }
         }

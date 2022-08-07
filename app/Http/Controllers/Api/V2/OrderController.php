@@ -26,14 +26,10 @@ class OrderController extends Controller
 
     public function store(Request $request, $set_paid = false)
     {
-
         $validate = Validator($request->all(), [
             'order_required_date' => "required|date",
-            'required_time' => ['required', 'date_format:H:i:s'],
+            'required_time'       => ['required', 'date_format:H:i:s'],
         ]);
-
-        // return $request;
-
 
         if ($validate->fails()) {
             $code = $this->returnCodeAccordingToInput($validate);
@@ -51,7 +47,6 @@ class OrderController extends Controller
         if (!$day) {
             return $this->returnError('404', 'لا يوجد توصيل في هذا اليوم');
         }
-        // return $day;
 
         if (
             Carbon::parse($request->required_time) >= Carbon::parse($day->start_time) &&
@@ -59,12 +54,8 @@ class OrderController extends Controller
         ) {
             // return 'open';
         } else {
-            return $this->returnError('404', 'من فضلك اختر وقت ما بين وقت بدايه ونهايه التوصيل لهذا اليوم علما بان هذا التاريخ سيوافق يوم '.$day->name.'');
+            return $this->returnError('404', 'من فضلك اختر وقت ما بين وقت بدايه ونهايه التوصيل لهذا اليوم علما بان هذا التاريخ سيوافق يوم ' . $day->name . '');
         }
-
-
-        // return $request;
-
 
         $cartItems = Cart::where('user_id', auth()->user()->id)->get();
 
@@ -78,22 +69,25 @@ class OrderController extends Controller
 
         $user = User::find(auth()->user()->id);
 
-
         $address = Address::where('id', $cartItems->first()->address_id)->first();
         $shippingAddress = [];
         if ($address != null) {
             $shippingAddress['name']        = $user->name;
             $shippingAddress['email']       = $user->email;
+            $shippingAddress['address_id']  = $address->id;
             $shippingAddress['address']     = $address->address;
+            $shippingAddress['country_id']  = $address->country_id;
             $shippingAddress['country']     = $address->country->name;
-            $shippingAddress['zone_id']     = $user->city_id;
-            $shippingAddress['state']       = $address->state->name;
+            $shippingAddress['city_id']     = $address->city_id;
             $shippingAddress['city']        = $address->city->name;
+            $shippingAddress['zone_id']     = $address->zone_id;
+            $shippingAddress['zone']        = $address->zone->name;
+            $shippingAddress['state_id']    = $address->state_id;
+            $shippingAddress['state']       = $address->state->name;
             $shippingAddress['postal_code'] = $address->postal_code;
             $shippingAddress['phone']       = $address->phone;
-            if ($address->latitude || $address->longitude) {
-                $shippingAddress['lat_lang'] = $address->latitude . ',' . $address->longitude;
-            }
+            $shippingAddress['latitude']    = $address->latitude;
+            $shippingAddress['longitude']   = $address->longitude;
         }
 
         $combined_order = new CombinedOrder;

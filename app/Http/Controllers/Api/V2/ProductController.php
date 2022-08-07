@@ -69,11 +69,11 @@ class ProductController extends Controller
     public function show(Request $request, $id)
     {
         try {
-            // get first address
-            $address = auth()->user()->addresses()->first();
-
             // get products
             $products = Product::where("id", $id)->get();
+
+            // get first address
+            $address = auth()->user()->addresses()->first();
 
             // get product zone based on address
             $zone = $products[0]->zones->where("zone_id", $address->zone_id)->first();
@@ -86,6 +86,20 @@ class ProductController extends Controller
             return response()->json([
                 'result'  => false,
                 'message' => translate('This product not allowed in your zone.')
+            ]);
+        }
+    }
+
+    public function getProduct(Request $request, $id)
+    {
+        try {
+            $products = Product::where("id", $id)->get();
+            $products[0]->main_price = $products[0]->unit_price;
+            return new ProductDetailCollection($products);
+        } catch (\Exception $e) {
+            return response()->json([
+                'result'  => false,
+                'message' => translate('Oops..')
             ]);
         }
     }
