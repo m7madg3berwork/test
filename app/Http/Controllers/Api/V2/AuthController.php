@@ -65,22 +65,8 @@ class AuthController extends Controller
             // customer
             if ($request->customer_type == 'retail') {
 
-                $code       = generateOTPCode();
-                $userOTP    = 'romooz';
-                $password   = '102030';
-                $sendername = 'ROMOOZ';
-                $text       = $code;
-                $to         = $request->email_or_phone;
-
-                /**
-                 * Send OTP
-                 */
-                $url = "http://www.sms4ksa.com/api/sendsms.php?username=$userOTP&password=$password&numbers=$to&message=$text&sender=$sendername&unicode=E&return=json";
-                $c = curl_init();
-                curl_setopt($c, CURLOPT_RETURNTRANSFER, 1);
-                curl_setopt($c, CURLOPT_URL, $url);
-                $contents = curl_exec($c);
-                curl_close($c);
+                $code = generateOTPCode();
+                sendOTPMessage($request->email_or_phone, $code);
 
                 $user = User::create([
                     'name'              => $request->name,
@@ -144,22 +130,8 @@ class AuthController extends Controller
             }
         }
 
-        $code       = generateOTPCode();
-        $userOTP    = 'romooz';
-        $password   = '102030';
-        $sendername = 'ROMOOZ';
-        $text       = $code;
-        $to         = $request->phone;
-
-        /**
-         * Send OTP
-         */
-        $url = "http://www.sms4ksa.com/api/sendsms.php?username=$userOTP&password=$password&numbers=$to&message=$text&sender=$sendername&unicode=E&return=json";
-        $c = curl_init();
-        curl_setopt($c, CURLOPT_RETURNTRANSFER, 1);
-        curl_setopt($c, CURLOPT_URL, $url);
-        $contents = curl_exec($c);
-        curl_close($c);
+        $code = generateOTPCode();
+        sendOTPMessage($request->phone, $code);
 
         $user->email_verified_at = null;
         $user->verification_code = $code;
@@ -174,8 +146,6 @@ class AuthController extends Controller
 
     public function resendCode(Request $request)
     {
-        // return 'fffffff';
-
         $validate = Validator($request->all(), [
             'register_by' => 'required|in:phone,email',
             'user_id' => 'required',
@@ -186,7 +156,7 @@ class AuthController extends Controller
             return $this->returnValidationError($code, $validate);
         }
 
-        $code = rand(1111, 9999);
+        $code = generateOTPCode();
         $ret = '';
 
         $user = User::where('id', $request->user_id)->first();
@@ -201,23 +171,7 @@ class AuthController extends Controller
             $user->notify(new AppEmailVerificationNotification());
         } else {
 
-            $userOTP = 'romooz';
-            $password = '102030';
-            $sendername = 'ROMOOZ';
-            //  $text = urlencode( $messageContent);
-            $text = $code;
-            $to = $user->phone;
-            // auth call
-            $url = "http://www.sms4ksa.com/api/sendsms.php?username=$userOTP&password=$password&numbers=$to&message=$text&sender=$sendername&unicode=E&return=json";
-
-            $c = curl_init();
-            curl_setopt($c, CURLOPT_RETURNTRANSFER, 1);
-            curl_setopt($c, CURLOPT_URL, $url);
-            $contents = curl_exec($c);
-            curl_close($c);
-
-            if ($contents) $ret = $contents;
-            else return FALSE;
+            sendOTPMessage($user->phone, $code);
 
             $ret = json_decode($ret, true);
             // return $ret;

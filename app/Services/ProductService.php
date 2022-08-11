@@ -41,7 +41,8 @@ class ProductService
             }
         }
         unset($collection['date_range']);
-        if ($collection['pdf']) {
+
+        if (isset($collection['pdf'])) {
             $collection['pdf'] = request()->pdf->store('uploads/products/pdf');
         }
         if ($collection['meta_title'] == null) {
@@ -50,12 +51,10 @@ class ProductService
         if ($collection['meta_description'] == null) {
             $collection['meta_description'] = strip_tags($collection['description']);
         }
-
         if ($collection['meta_img'] == null) {
             $collection['meta_img'] = $collection['thumbnail_img'];
         }
-
-        if ($collection['return_policy'] == null) {
+        if (isset($collection['return_policy'])) {
             $collection['return_policy'] = $collection['return_policy'];
         }
 
@@ -89,7 +88,6 @@ class ProductService
         if (count($combinations[0]) > 0) {
             foreach ($combinations as $key => $combination) {
                 $str = ProductUtility::get_combination_string($combination, $collection);
-
                 unset($collection['price_' . str_replace('.', '_', $str)]);
                 unset($collection['sku_' . str_replace('.', '_', $str)]);
                 unset($collection['qty_' . str_replace('.', '_', $str)]);
@@ -160,21 +158,21 @@ class ProductService
         $slug_suffix = $same_slug_count > 1 ? '-' . $same_slug_count + 1 : '';
         $slug .= $slug_suffix;
 
-        if(addon_is_activated('refund_request') && !isset($collection['refundable'])){
+        if (addon_is_activated('refund_request') && !isset($collection['refundable'])) {
             $collection['refundable'] = 0;
         }
 
-        if(!isset($collection['is_quantity_multiplied'])){
+        if (!isset($collection['is_quantity_multiplied'])) {
             $collection['is_quantity_multiplied'] = 0;
         }
 
-        if(!isset($collection['cash_on_delivery'])){
+        if (!isset($collection['cash_on_delivery'])) {
             $collection['cash_on_delivery'] = 0;
         }
-        if(!isset($collection['featured'])){
+        if (!isset($collection['featured'])) {
             $collection['featured'] = 0;
         }
-        if(!isset($collection['todays_deal'])){
+        if (!isset($collection['todays_deal'])) {
             $collection['todays_deal'] = 0;
         }
 
@@ -200,7 +198,7 @@ class ProductService
             $discount_end_date   = strtotime($date_var[1]);
         }
         unset($collection['date_range']);
-        if ($collection['pdf']) {
+        if (isset($collection['pdf'])) {
             $collection['pdf'] = request()->pdf->store('uploads/products/pdf');
         }
         if ($collection['meta_title'] == null) {

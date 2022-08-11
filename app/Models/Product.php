@@ -97,6 +97,11 @@ class Product extends Model
         return $this->hasMany(ProductsZones::class);
     }
 
+    public function states()
+    {
+        return $this->hasMany(ProductsStates::class);
+    }
+
     public function users()
     {
         return $this->belongsToMany(CustomerPackage::class);

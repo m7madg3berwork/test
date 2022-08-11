@@ -172,6 +172,14 @@
                 type: 'post',
                 success: function(response) {
                     console.log(response);
+                    if(response.active == 1)
+                    {
+                        AIZ.plugins.notify('success', "{{ translate('User is active.') }}");
+                    }
+                    else
+                    {
+                        AIZ.plugins.notify('danger', "{{ translate('User is disactive.') }}");
+                    }
                 }
             });
         }

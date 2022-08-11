@@ -16,17 +16,21 @@ class StateController extends Controller
     public function index(Request $request)
     {
         $sort_country = $request->sort_country;
-        $sort_state = $request->sort_state;
+        $sort_state   = $request->sort_state;
 
         $state_queries = State::query();
+
         if ($request->sort_state) {
             $state_queries->where('name', 'like', "%$sort_state%");
         }
+
         if ($request->sort_country) {
             $state_queries->where('country_id', $request->sort_country);
         }
 
-        $states = $state_queries->orderBy('status', 'desc')->paginate(15);
+        $states = $state_queries->orderBy('status', 'desc')
+            ->paginate(15);
+
         return view('backend.setup_configurations.states.index', compact('states', 'sort_country', 'sort_state'));
     }
 
@@ -48,13 +52,7 @@ class StateController extends Controller
      */
     public function store(Request $request)
     {
-        $state = new State;
-
-        $state->name        = $request->name;
-        $state->country_id  = $request->country_id;
-
-        $state->save();
-
+        State::create($request->all());
         flash(translate('State has been inserted successfully'))->success();
         return back();
     }
@@ -78,9 +76,8 @@ class StateController extends Controller
      */
     public function edit($id)
     {
-        $state  = State::findOrFail($id);
+        $state     = State::findOrFail($id);
         $countries = Country::where('status', 1)->get();
-
         return view('backend.setup_configurations.states.edit', compact('countries', 'state'));
     }
 
@@ -94,14 +91,14 @@ class StateController extends Controller
     public function update(Request $request, $id)
     {
         $state = State::findOrFail($id);
-
-        $state->name        = $request->name;
-        $state->country_id  = $request->country_id;
-
+        $state->name       = $request->name;
+        $state->country_id = $request->country_id;
+        $state->retailer_cost = $request->retailer_cost;
+        $state->wholesaler_cost = $request->wholesaler_cost;
         $state->save();
 
         flash(translate('State has been updated successfully'))->success();
-        return back();
+        return redirect(route('states.index'));
     }
 
     /**

@@ -37,23 +37,29 @@
                 <tr>
                     <th data-breakpoints="lg">#</th>
                     <th>{{translate('Name')}}</th>
-                    <th data-breakpoints="lg">{{translate('Email Address')}}</th>
                     <th data-breakpoints="lg">{{translate('Phone')}}</th>
                     <th>{{translate('Earning')}}</th>
                     <th>{{translate('Collection')}}</th>
                     <th>{{ translate('Active') }}</th>
-                    <th width="10%">{{translate('Options')}}</th>
+                    <th width="10%">{{ translate('Options') }}</th>
                 </tr>
             </thead>
             <tbody>
                 @foreach($delivery_boys as $key => $delivery_boy)
                 @if ($delivery_boy->user != null)
                 <tr>
-                    <td>{{ ($key+1) + ($delivery_boys->currentPage() - 1)*$delivery_boys->perPage() }}</td>
-                    <td>@if($delivery_boy->user->banned == 1) <i class="las la-ban text-danger" aria-hidden="true"></i>
-                        @endif {{$delivery_boy->user->name}}</td>
-                    <td>{{$delivery_boy->user->email}}</td>
-                    <td>{{$delivery_boy->user->phone}}</td>
+                    <td>
+                        {{ ($key+1) + ($delivery_boys->currentPage()-1)* $delivery_boys->perPage() }}
+                    </td>
+                    <td>
+                        @if($delivery_boy->user->banned == 1)
+                        <i class="las la-ban text-danger" aria-hidden="true"></i>
+                        @endif
+                        {{$delivery_boy->user->name}}
+                    </td>
+                    <td>
+                        {{$delivery_boy->user->phone}}
+                    </td>
                     <td>
                         {{ single_price($delivery_boy->total_earning) }}
                     </td>
@@ -101,10 +107,10 @@
                                     class="dropdown-item">
                                     {{translate('Go to Collection')}}
                                 </a>
-                                <a href="#" onclick="show_delivery_earning_modal('{{$delivery_boy->user->id}}');"
+                                {{-- <a href="#" onclick="show_delivery_earning_modal('{{$delivery_boy->user->id}}');"
                                     class="dropdown-item">
                                     {{translate('Go to Payment')}}
-                                </a>
+                                </a> --}}
                                 {{--
                                 <a href="#" class="dropdown-item confirm-delete"
                                     data-href="{{ route('delivery-boys.destroy', $delivery_boy->user->id) }}" class="">

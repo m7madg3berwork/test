@@ -7,8 +7,10 @@ use App\Models\AttributeValue;
 use App\Models\Cart;
 use App\Models\Category;
 use App\Models\Product;
+use App\Models\ProductsStates;
 use App\Models\ProductTax;
 use App\Models\ProductTranslation;
+use App\Models\State;
 use App\Models\Zone;
 use App\Services\ProductFlashDealService;
 use App\Services\ProductService;
@@ -51,11 +53,9 @@ class ProductController extends Controller
      */
     public function admin_products(Request $request)
     {
-//        //CoreComponentRepository::instantiateShopRepository();
-
-        $type = 'In House';
-        $col_name = null;
-        $query = null;
+        $type        = 'In House';
+        $col_name    = null;
+        $query       = null;
         $sort_search = null;
 
         $products = Product::where('added_by', 'admin')->where('auction_product', 0)->where('wholesale_product', 0);
@@ -67,6 +67,7 @@ class ProductController extends Controller
             $products = $products->orderBy($col_name, $query);
             $sort_type = $request->type;
         }
+
         if ($request->search != null) {
             $sort_search = $request->search;
             $products = $products
@@ -156,16 +157,15 @@ class ProductController extends Controller
      */
     public function create()
     {
-        // //CoreComponentRepository::initializeCache();
-
         $categories = Category::where('parent_id', 0)
             ->where('digital', 0)
             ->with('childrenCategories')
             ->get();
 
-        $zones = Zone::all();
+        $states = State::where("status", 1)
+            ->get();
 
-        return view('backend.product.products.create', compact('categories','zones'));
+        return view('backend.product.products.create', compact('categories', 'states'));
     }
 
     public function add_more_choice_option(Request $request)
@@ -191,52 +191,54 @@ class ProductController extends Controller
      */
     public function store(ProductRequest $request)
     {
-        \DB::beginTransaction();
-        try {
-            $product = $this->productService->store($request->except([
-                '_token', 'sku', 'choice', 'tax_id', 'tax', 'tax_type', 'flash_deal_id', 'flash_discount', 'flash_discount_type',
-            ]));
+        // \DB::beginTransaction();
+        // try {
 
-            //VAT & Tax
-            if ($request->tax_id) {
-                $request->merge(['product_id' => $product->id]);
-                $this->productTaxService->store($request->only([
-                    'tax_id', 'tax', 'tax_type', 'product_id',
-                ]));
+        $product = $this->productService->store($request->except([
+            '_token', 'sku', 'choice', 'tax_id', 'tax', 'tax_type', 'flash_deal_id', 'flash_discount', 'flash_discount_type',
+        ]));
+
+        //Product Stock
+        $this->productStockService->store($request->only([
+            'colors_active', 'colors', 'choice_no', 'unit_price', 'sku', 'current_stock', 'product_id',
+        ]), $product);
+
+        /**
+         * Save States
+         */
+        ProductsStates::where("product_id", $product->id)->delete();
+        $states = $request->states;
+        if (count($states) > 0) {
+            foreach ($states as $state) {
+                ProductsStates::create([
+                    'product_id' => $product->id,
+                    'state_id'   => $state['state_id'],
+                    'cost'       => $state['cost'],
+                    'qty'        => $state['qty'],
+                ]);
             }
-
-            //Flash Deal
-//            $this->productFlashDealService->store($request->only([
-//                'flash_deal_id', 'flash_discount', 'flash_discount_type',
-//            ]), $product);'
-
-            //Product Stock
-            $this->productStockService->store($request->only([
-                'colors_active', 'colors', 'choice_no', 'unit_price', 'sku', 'current_stock', 'product_id',
-            ]), $product);
-
-            if(!empty($request->zones)) {
-                $this->ProductZonesService->store($request->only([
-                    'zones',
-                ]), $product);
-            }
-            // Product Translations
-            $request->merge(['lang' => env('DEFAULT_LANGUAGE')]);
-            ProductTranslation::create($request->only([
-                'lang', 'name', 'unit', 'description', 'product_id',
-            ]));
-
-
-//            //Artisan::call('view:clear');
-//        //Artisan::call('cache:clear');
-            flash(translate('Product has been inserted successfully'))->success();
-            \DB::commit();
-            return redirect()->route('products.admin');
-        } catch (\Exception $e) {
-            \DB::rollBack();
-            flash(translate('error in store product'))->error();
-            return redirect()->route('products.create');
         }
+
+        // Product Translations
+        $request->merge(
+            [
+                'lang' => env('DEFAULT_LANGUAGE')
+            ]
+        );
+        ProductTranslation::create($request->only([
+            'lang', 'name', 'unit', 'description', 'product_id',
+        ]));
+
+        flash(translate('Product has been inserted successfully'))->success();
+
+        // \DB::commit();
+
+        return redirect()->route('products.admin');
+        // } catch (\Exception $e) {
+        //     \DB::rollBack();
+        //     flash(translate('error in store product'))->error();
+        //     return redirect()->route('products.create');
+        // }
     }
 
     /**
@@ -258,9 +260,8 @@ class ProductController extends Controller
      */
     public function admin_product_edit(Request $request, $id)
     {
-//        //CoreComponentRepository::initializeCache();
-
         $product = Product::findOrFail($id);
+
         if ($product->digital == 1) {
             return redirect('admin/digitalproducts/' . $id . '/edit');
         }
@@ -271,9 +272,14 @@ class ProductController extends Controller
             ->where('digital', 0)
             ->with('childrenCategories')
             ->get();
-        $zones = Zone::all();
-        $zonesSelected = $this->ProductZonesService->getSelected($product);
-        return view('backend.product.products.edit', compact('product', 'categories', 'tags', 'lang','zones','zonesSelected'));
+
+        $states = State::where("status", 1)
+            ->get();
+
+        $statesSelected = ProductsStates::where('product_id', $product->id)
+            ->get();
+
+        return view('backend.product.products.edit', compact('product', 'categories', 'tags', 'lang', 'states', 'statesSelected'));
     }
 
     /**
@@ -312,9 +318,10 @@ class ProductController extends Controller
     {
         \DB::beginTransaction();
         try {
+
             //Product
             $product = $this->productService->update($request->except([
-                '_token', 'sku', 'choice', 'tax_id', 'tax', 'tax_type', 'flash_deal_id', 'flash_discount', 'flash_discount_type','return_policy'
+                '_token', 'sku', 'choice', 'tax_id', 'tax', 'tax_type', 'flash_deal_id', 'flash_discount', 'flash_discount_type', 'return_policy'
             ]), $product);
 
             //Product Stock
@@ -327,27 +334,22 @@ class ProductController extends Controller
                 'colors_active', 'colors', 'choice_no', 'unit_price', 'sku', 'current_stock', 'product_id',
             ]), $product);
 
-//            //Flash Deal
-//            $this->productFlashDealService->store($request->only([
-//                'flash_deal_id', 'flash_discount', 'flash_discount_type',
-//            ]), $product);
-
-            // update zone
-            if(!empty($request->zones)) {
-                $this->ProductZonesService->update($request->only([
-                    'zones',
-                ]), $product);
+            /**
+             * Save States
+             */
+            ProductsStates::where("product_id", $product->id)->delete();
+            $states = $request->states;
+            if (count($states) > 0) {
+                foreach ($states as $state) {
+                    ProductsStates::create([
+                        'product_id' => $product->id,
+                        'state_id'   => $state['state_id'],
+                        'cost'       => $state['cost'],
+                        'qty'        => $state['qty'],
+                    ]);
+                }
             }
 
-
-            //VAT & Tax
-            if ($request->tax_id) {
-                ProductTax::where('product_id', $product->id)->delete();
-                $request->merge(['product_id' => $product->id]);
-                $this->productTaxService->store($request->only([
-                    'tax_id', 'tax', 'tax_type', 'product_id',
-                ]));
-            }
 
             // Product Translations
             ProductTranslation::updateOrCreate(
@@ -361,13 +363,9 @@ class ProductController extends Controller
 
             flash(translate('Product has been updated successfully'))->success();
 
-            //Artisan::call('view:clear');
-        //Artisan::call('cache:clear');
-
             \DB::commit();
 
-            return back();
-
+            return redirect()->route('products.admin');
         } catch (\Exception $e) {
             \DB::rollBack();
             flash(translate('error in update product'))->error();
@@ -395,7 +393,7 @@ class ProductController extends Controller
             flash(translate('Product has been deleted successfully'))->success();
 
             //Artisan::call('view:clear');
-        //Artisan::call('cache:clear');
+            //Artisan::call('cache:clear');
 
             return back();
         } else {
@@ -443,7 +441,6 @@ class ProductController extends Controller
         } elseif ($request->type == 'All') {
             return redirect()->route('products.admin');
         }
-
     }
 
     public function get_products_by_brand(Request $request)
@@ -507,7 +504,7 @@ class ProductController extends Controller
         $product->featured = $request->status;
         if ($product->save()) {
             //Artisan::call('view:clear');
-        //Artisan::call('cache:clear');
+            //Artisan::call('cache:clear');
             return 1;
         }
         return 0;

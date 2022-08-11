@@ -50,6 +50,27 @@ use App\Http\Controllers\SupportTicketController;
 use App\Http\Controllers\WalletController;
 use App\Http\Controllers\WishlistController;
 
+Route::get('/test/send/otp/{mobile}',  function ($mobile) {
+    $USER_OTP       = env('USER_OTP');
+    $PASSWORD_OTP   = env('PASSWORD_OTP');
+    $SENDERNAME_OTP = env('SENDERNAME_OTP');
+    $text           = 'test';
+    $to             = $mobile;
+
+    $url = "http://www.sms4ksa.com/api/sendsms.php?username=$USER_OTP&password=$PASSWORD_OTP&numbers=$to&message=$text&sender=$SENDERNAME_OTP&unicode=E&return=json";
+
+    $c = curl_init();
+    curl_setopt($c, CURLOPT_RETURNTRANSFER, 1);
+    curl_setopt($c, CURLOPT_URL, $url);
+    $contents = curl_exec($c);
+    curl_close($c);
+
+    if ($contents)
+        dd(json_decode($contents));
+    else
+        dd("Fail");
+});
+
 /*
 |--------------------------------------------------------------------------
 | Web Routes

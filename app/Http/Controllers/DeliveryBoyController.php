@@ -26,10 +26,11 @@ class DeliveryBoyController extends Controller
      */
     public function index(Request $request)
     {
-        $sort_search = null;
-        $delivery_boys = DeliveryBoy::orderBy('created_at', 'desc')->whereHas("user");
-        if ($request->has('search')) {
-            $sort_search = $request->search;
+        $delivery_boys = DeliveryBoy::orderBy('created_at', 'desc')
+            ->whereHas("user");
+
+        $sort_search = $request->search;
+        if ($sort_search != null) {
             $user_ids = User::where('user_type', 'delivery_boy')->where(function ($user) use ($sort_search) {
                 $user->where('name', 'like', '%' . $sort_search . '%')
                     ->orWhere('email', 'like', '%' . $sort_search . '%');
@@ -38,7 +39,9 @@ class DeliveryBoyController extends Controller
                 $delivery_boy->whereIn('user_id', $user_ids);
             });
         }
+
         $delivery_boys = $delivery_boys->paginate(15);
+
         return view('delivery_boys.index', compact('delivery_boys', 'sort_search'));
     }
 
@@ -49,7 +52,8 @@ class DeliveryBoyController extends Controller
      */
     public function create()
     {
-        $countries = Country::where('status', 1)->get();
+        $countries = Country::where('status', 1)
+            ->get();
         $zones = Zone::all();
         return view('delivery_boys.create', compact('countries', 'zones'));
     }
@@ -63,40 +67,24 @@ class DeliveryBoyController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'name'          => 'required',
-            'email'         => 'required|unique:users|max:255',
-            'phone'         => 'required',
-            'country_id'    => 'required',
-            'state_id'       => 'required',
-            'city_id'       => 'required',
-            'zone_id'       => 'required',
+            'name'       => 'required',
+            'phone'      => 'required',
+            'country_id' => 'required',
+            'state_id'   => 'required',
         ]);
 
-        $zone = '';
         $country = Country::where('id', $request->country_id)->first();
-        $state = State::where('id', $request->state_id)->first();
-        $city = City::where('id', $request->city_id)->first();
-        if (isset($request->zone_id))
-            $zone = Zone::where('id', $request->zone_id)->first()->name;
+        $state   = State::where('id', $request->state_id)->first();
 
-
-        $user                       = new User;
-        $user->user_type            = 'delivery_boy';
-        $user->name                 = $request->name;
-        $user->email                = $request->email;
-        $user->phone                = $request->phone;
-        $user->country              = $country->name;
-        $user->state                  = $state->name;
-        $user->city                 = $city->name;
-        $user->zone                 = $zone;
-        $user->avatar_original      = $request->avatar_original;
-        $user->address              = $request->address;
-        $user->email_verified_at    = date("Y-m-d H:i:s");
-        $user->password             = Hash::make($request->password);
+        $user = new User;
+        $user->user_type = 'delivery_boy';
+        $user->name      = $request->name;
+        $user->phone     = $request->phone;
+        $user->country   = $country->name;
+        $user->state     = $state->name;
         $user->save();
 
         $delivery_boy = new DeliveryBoy;
-
         $delivery_boy->user_id = $user->id;
         $delivery_boy->save();
 
@@ -145,32 +133,18 @@ class DeliveryBoyController extends Controller
 
         $request->validate([
             'name'       => 'required',
-            'email'      => 'required|unique:users,email,' . $delivery_boy->id,
             'phone'      => 'required',
             'country_id' => 'required',
             'state_id'   => 'required',
-            'city_id'    => 'required',
-            'zone_id'    => 'required',
         ]);
 
         $country = Country::where('id', $request->country_id)->first();
         $state = State::where('id', $request->state_id)->first();
-        $city = City::where('id', $request->city_id)->first();
-        $zone = Zone::where('id', $request->zone_id)->first();
 
-        $delivery_boy->name             = $request->name;
-        $delivery_boy->email            = $request->email;
-        $delivery_boy->phone            = $request->phone;
-        $delivery_boy->country          = $country->name;
-        $delivery_boy->state            = $state->name;
-        $delivery_boy->city             = $city->name;
-        $delivery_boy->zone             = $zone->name;
-        $delivery_boy->avatar_original  = $request->avatar_original;
-        $delivery_boy->address          = $request->address;
-
-        if (strlen($request->password) > 0) {
-            $delivery_boy->password = Hash::make($request->password);
-        }
+        $delivery_boy->name    = $request->name;
+        $delivery_boy->phone   = $request->phone;
+        $delivery_boy->country = $country->name;
+        $delivery_boy->state   = $state->name;
 
         $delivery_boy->save();
 

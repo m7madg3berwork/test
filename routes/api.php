@@ -5,34 +5,6 @@ use Illuminate\Http\Request;
 
 Route::group(['prefix' => 'v2/auth', 'middleware' => ['app_language']], function () {
 
-
-
-    Route::get('/test-otp',  function () {
-        $userOTP = 'romooz';
-        $password = '102030';
-        $sendername = 'ROMOOZ-AD';
-        //  $text = urlencode( $messageContent);
-        $text = '123';
-        $to = '+966550174618';
-        // auth call
-        $url = "http://www.sms4ksa.com/api/sendsms.php?username=$userOTP&password=$password&numbers=$to&message=$text&sender=$sendername&unicode=E&return=json";
-
-        $c = curl_init();
-        curl_setopt($c, CURLOPT_RETURNTRANSFER, 1);
-        curl_setopt($c, CURLOPT_URL, $url);
-        $contents = curl_exec($c);
-        curl_close($c);
-
-        if ($contents) $ret = $contents;
-        else return FALSE;
-
-        $ret = json_decode($ret, true);
-        return $ret;
-    });
-
-
-
-
     Route::post('login', 'App\Http\Controllers\Api\V2\AuthController@login');
 
     Route::get('loginToken', function () {

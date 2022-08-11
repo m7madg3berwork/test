@@ -12,14 +12,14 @@
             @csrf
             <div class="card-body">
 
-				@if ($errors->any())
-                    <div class="alert alert-danger">
-                        <ul>
-                            @foreach ($errors->all() as $error)
-                                <li>{{ $error }}</li>
-                            @endforeach
-                        </ul>
-                    </div>
+                @if ($errors->any())
+                <div class="alert alert-danger">
+                    <ul>
+                        @foreach ($errors->all() as $error)
+                        <li>{{ $error }}</li>
+                        @endforeach
+                    </ul>
+                </div>
                 @endif
 
                 <div class="form-group row">
@@ -27,55 +27,44 @@
                         {{translate('Name')}} <span class="text-danger">*</span>
                     </label>
                     <div class="col-sm-10">
-                        <input type="text" class="form-control" name="name" value="{{ old('name') }}" placeholder="Name" required>
+                        <input type="text" class="form-control" name="name" value="{{ old('name') }}" placeholder="Name"
+                            required>
                     </div>
                 </div>
-                <div class="form-group row">
+
+                {{-- <div class="form-group row">
                     <label class="col-sm-2 col-from-label" for="email">
                         {{translate('Email')}} <span class="text-danger">*</span>
                     </label>
                     <div class="col-sm-10">
-                        <input type="text" class="form-control" name="email" value="{{ old('email') }}" placeholder="Email" required>
+                        <input type="text" class="form-control" name="email" value="{{ old('email') }}"
+                            placeholder="Email" required>
                     </div>
-                </div>
+                </div> --}}
+
                 <div class="form-group row">
                     <label class="col-sm-2 col-from-label" for="phone">
                         {{translate('Phone')}} <span class="text-danger">*</span>
                     </label>
                     <div class="col-sm-10">
-                        <input type="text" class="form-control" name="phone" value="{{ old('phone') }}" placeholder="Phone" required>
+                        <input type="text" class="form-control" name="phone" value="{{ old('phone') }}"
+                            placeholder="Phone" required>
                     </div>
                 </div>
-                <div class="form-group row">
-                    <label class="col-sm-2 col-from-label" for="password">
-                        {{translate('Password')}} <span class="text-danger">*</span>
-                    </label>
-                    <div class="col-sm-10">
-                        <input type="password" class="form-control" name="password" placeholder="Password" required>
-                    </div>
-                </div>
+
                 <div class="form-group row">
                     <label class="col-sm-2 col-from-label" for="type">
                         {{translate('Country')}} <span class="text-danger">*</span>
                     </label>
                     <div class="col-sm-10">
-                        <select class="form-control aiz-selectpicker" data-live-search="true" name="country_id" id="country_id" required>
+                        <select class="form-control aiz-selectpicker" data-live-search="true" name="country_id"
+                            id="country_id" required>
                             <option value="">{{translate('Select Country')}}</option>
                             @foreach ($countries as $country)
-                                <option value="{{ $country->id }}">
-									{{ $country->name }}
-								</option>
+                            <option value="{{ $country->id }}">
+                                {{ $country->name }}
+                            </option>
                             @endforeach
-                        </select>
-                    </div>
-                </div>
-				<div class="row">
-                    <div class="col-md-2">
-                        <label>{{ translate('State')}}</label>
-                    </div>
-                    <div class="col-md-10">
-                        <select class="form-control mb-3 aiz-selectpicker" data-live-search="true" name="state_id" required>
-
                         </select>
                     </div>
                 </div>
@@ -85,30 +74,43 @@
                         <label>{{ translate('City')}}</label>
                     </div>
                     <div class="col-md-10">
-                        <select class="form-control mb-3 aiz-selectpicker" data-live-search="true" name="city_id" required>
-
+                        <select class="form-control mb-3 aiz-selectpicker" data-live-search="true" name="state_id"
+                            required>
                         </select>
                     </div>
                 </div>
 
-                <div class="row">
+                {{-- <div class="row">
+                    <div class="col-md-2">
+                        <label>{{ translate('City')}}</label>
+                    </div>
+                    <div class="col-md-10">
+                        <select class="form-control mb-3 aiz-selectpicker" data-live-search="true" name="city_id"
+                            required>
+                        </select>
+                    </div>
+                </div> --}}
+
+                {{-- <div class="row">
                     <div class="col-md-2">
                         <label>{{ translate('Zone')}}</label>
                     </div>
                     <div class="col-md-10">
-                        <select class="form-control mb-3 aiz-selectpicker" data-live-search="true" name="zone_id" required>
-
+                        <select class="form-control mb-3 aiz-selectpicker" data-live-search="true" name="zone_id"
+                            required>
                         </select>
                     </div>
-                </div>
-                <div class="form-group row">
+                </div> --}}
+
+                {{-- <div class="form-group row">
                     <label class="col-md-2 col-form-label" for="signinSrEmail">
                         {{translate('Image')}}
                     </label>
                     <div class="col-md-10">
                         <div class="input-group" data-toggle="aizuploader" data-type="image" data-multiple="false">
                             <div class="input-group-prepend">
-                                <div class="input-group-text bg-soft-secondary font-weight-medium">{{ translate('Browse')}}</div>
+                                <div class="input-group-text bg-soft-secondary font-weight-medium">{{
+                                    translate('Browse')}}</div>
                             </div>
                             <div class="form-control file-amount">{{ translate('Choose File') }}</div>
                             <input type="hidden" name="avatar_original" class="selected-files">
@@ -116,13 +118,27 @@
                         <div class="file-preview box sm">
                         </div>
                     </div>
-                </div>
-                <div class="form-group row">
+                </div> --}}
+
+                {{-- <div class="form-group row">
                     <label class="col-sm-2 col-from-label">{{translate('Address')}}</label>
                     <div class="col-sm-10">
                         <textarea class="form-control" name="address"></textarea>
                     </div>
-                </div>
+                </div> --}}
+
+                {{--
+                delivery_type
+                national_id
+                national_id_attachment
+                national_id_expired
+                license_id
+                license_id_attachment
+                license_id_expired
+                license_car
+                license_car_attachment
+                license_car_expire
+                --}}
 
                 <div class="form-group mb-3 text-right">
                     <button type="submit" class="btn btn-primary">{{translate('Save')}}</button>
@@ -135,9 +151,8 @@
 @endsection
 
 @section('script')
-    <script type="text/javascript">
-
-        (function($) {
+<script type="text/javascript">
+    (function($) {
 			"use strict";
 
             $(document).on('change', '[name=country_id]', function() {
@@ -204,5 +219,5 @@
             });
         })(jQuery);
 
-    </script>
+</script>
 @endsection
