@@ -29,8 +29,8 @@ class AddressController extends Controller
         $address->address     = $request->address;
         $address->country_id  = $request->country_id;
         $address->state_id    = $request->state_id;
-        $address->city_id     = $request->city_id;
-        $address->zone_id     = $request->zone_id;
+        // $address->city_id     = $request->city_id;
+        // $address->zone_id     = $request->zone_id;
         $address->postal_code = $request->postal_code;
         $address->phone       = $request->phone;
         $address->save();
@@ -45,12 +45,12 @@ class AddressController extends Controller
                 'address'            => $address->address,
                 'country_id'         => (int)  $address->country_id,
                 'state_id'           => (int) $address->state_id,
-                'city_id'            => (int) $address->city_id,
-                'zone_id'            => (int) $address->zone_id,
+                // 'city_id'            => (int) $address->city_id,
+                // 'zone_id'            => (int) $address->zone_id,
                 'country_name'       => optional($address->country)->name,
                 'state_name'         => optional($address->state)->name,
-                'city_name'          => optional($address->city)->name,
-                'zone_name'          => optional($address->zone)->name,
+                // 'city_name'          => optional($address->city)->name,
+                // 'zone_name'          => optional($address->zone)->name,
                 'postal_code'        => $address->postal_code,
                 'phone'              => $address->phone,
             ]
@@ -63,8 +63,8 @@ class AddressController extends Controller
         $address->address = $request->address;
         $address->country_id = $request->country_id;
         $address->state_id = $request->state_id;
-        $address->city_id = $request->city_id;
-        $address->zone_id = $request->zone_id;
+        // $address->city_id = $request->city_id;
+        // $address->zone_id = $request->zone_id;
         $address->postal_code = $request->postal_code;
         $address->phone = $request->phone;
         $address->save();
@@ -121,7 +121,12 @@ class AddressController extends Controller
     public function updateAddressInCart(Request $request)
     {
         try {
-            Cart::where('user_id', auth()->user()->id)->update(['address_id' => $request->address_id]);
+            Cart::where('user_id', auth()->user()->id)
+                ->update(
+                    [
+                        'address_id' => $request->address_id
+                    ]
+                );
         } catch (\Exception $e) {
             return response()->json([
                 'result' => false,

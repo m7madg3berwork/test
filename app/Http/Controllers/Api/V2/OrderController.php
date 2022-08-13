@@ -28,7 +28,10 @@ class OrderController extends Controller
     {
         $validate = Validator($request->all(), [
             'order_required_date' => "required|date",
-            'required_time'       => ['required', 'date_format:H:i:s'],
+            'required_time'       => [
+                'required',
+                'date_format:H:i:s'
+            ],
         ]);
 
         if ($validate->fails()) {
@@ -78,12 +81,12 @@ class OrderController extends Controller
             $shippingAddress['address']     = $address->address;
             $shippingAddress['country_id']  = $address->country_id;
             $shippingAddress['country']     = $address->country->name;
-            $shippingAddress['city_id']     = $address->city_id;
-            $shippingAddress['city']        = $address->city->name;
-            $shippingAddress['zone_id']     = $address->zone_id;
-            $shippingAddress['zone']        = $address->zone->name;
             $shippingAddress['state_id']    = $address->state_id;
             $shippingAddress['state']       = $address->state->name;
+            // $shippingAddress['city_id']     = $address->city_id;
+            // $shippingAddress['city']        = $address->city->name;
+            // $shippingAddress['zone_id']     = $address->zone_id;
+            // $shippingAddress['zone']        = $address->zone->name;
             $shippingAddress['postal_code'] = $address->postal_code;
             $shippingAddress['phone']       = $address->phone;
             $shippingAddress['latitude']    = $address->latitude;

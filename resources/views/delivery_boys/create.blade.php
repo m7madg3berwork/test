@@ -24,7 +24,8 @@
 
                 <div class="form-group row">
                     <label class="col-sm-2 col-from-label" for="name">
-                        {{translate('Name')}} <span class="text-danger">*</span>
+                        {{translate('Name')}}
+                        <span class="text-danger">*</span>
                     </label>
                     <div class="col-sm-10">
                         <input type="text" class="form-control" name="name" value="{{ old('name') }}" placeholder="Name"
@@ -32,19 +33,10 @@
                     </div>
                 </div>
 
-                {{-- <div class="form-group row">
-                    <label class="col-sm-2 col-from-label" for="email">
-                        {{translate('Email')}} <span class="text-danger">*</span>
-                    </label>
-                    <div class="col-sm-10">
-                        <input type="text" class="form-control" name="email" value="{{ old('email') }}"
-                            placeholder="Email" required>
-                    </div>
-                </div> --}}
-
                 <div class="form-group row">
                     <label class="col-sm-2 col-from-label" for="phone">
-                        {{translate('Phone')}} <span class="text-danger">*</span>
+                        {{translate('Phone')}}
+                        <span class="text-danger">*</span>
                     </label>
                     <div class="col-sm-10">
                         <input type="text" class="form-control" name="phone" value="{{ old('phone') }}"
@@ -54,7 +46,23 @@
 
                 <div class="form-group row">
                     <label class="col-sm-2 col-from-label" for="type">
-                        {{translate('Country')}} <span class="text-danger">*</span>
+                        {{translate('Delivery Type')}}
+                        <span class="text-danger">*</span>
+                    </label>
+                    <div class="col-sm-10">
+                        <select class="form-control aiz-selectpicker" data-live-search="true" name="delivery_type"
+                            required>
+                            <option value="">{{translate('Select Delivery Type')}}</option>
+                            <option value="1">{{translate('Delivery Type 1')}}</option>
+                            <option value="2">{{translate('Delivery Type 2')}}</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-group row">
+                    <label class="col-sm-2 col-from-label" for="type">
+                        {{translate('Country')}}
+                        <span class="text-danger">*</span>
                     </label>
                     <div class="col-sm-10">
                         <select class="form-control aiz-selectpicker" data-live-search="true" name="country_id"
@@ -71,7 +79,10 @@
 
                 <div class="row">
                     <div class="col-md-2">
-                        <label>{{ translate('City')}}</label>
+                        <label>
+                            {{ translate('City')}}
+                            <span class="text-danger">*</span>
+                        </label>
                     </div>
                     <div class="col-md-10">
                         <select class="form-control mb-3 aiz-selectpicker" data-live-search="true" name="state_id"
@@ -80,65 +91,71 @@
                     </div>
                 </div>
 
-                {{-- <div class="row">
-                    <div class="col-md-2">
-                        <label>{{ translate('City')}}</label>
-                    </div>
-                    <div class="col-md-10">
-                        <select class="form-control mb-3 aiz-selectpicker" data-live-search="true" name="city_id"
-                            required>
-                        </select>
-                    </div>
-                </div> --}}
-
-                {{-- <div class="row">
-                    <div class="col-md-2">
-                        <label>{{ translate('Zone')}}</label>
-                    </div>
-                    <div class="col-md-10">
-                        <select class="form-control mb-3 aiz-selectpicker" data-live-search="true" name="zone_id"
-                            required>
-                        </select>
-                    </div>
-                </div> --}}
-
-                {{-- <div class="form-group row">
-                    <label class="col-md-2 col-form-label" for="signinSrEmail">
-                        {{translate('Image')}}
+                <div class="form-group row">
+                    <label class="col-sm-2 col-from-label">
+                        {{ translate('National ID') }}
+                        <span class="text-danger">*</span>
                     </label>
-                    <div class="col-md-10">
-                        <div class="input-group" data-toggle="aizuploader" data-type="image" data-multiple="false">
-                            <div class="input-group-prepend">
-                                <div class="input-group-text bg-soft-secondary font-weight-medium">{{
-                                    translate('Browse')}}</div>
-                            </div>
-                            <div class="form-control file-amount">{{ translate('Choose File') }}</div>
-                            <input type="hidden" name="avatar_original" class="selected-files">
-                        </div>
-                        <div class="file-preview box sm">
-                        </div>
-                    </div>
-                </div> --}}
-
-                {{-- <div class="form-group row">
-                    <label class="col-sm-2 col-from-label">{{translate('Address')}}</label>
                     <div class="col-sm-10">
-                        <textarea class="form-control" name="address"></textarea>
+                        <input type="text" class="form-control" name="national_id" value="{{ old('national_id') }}"
+                            placeholder="{{ translate('National ID') }}" required>
                     </div>
-                </div> --}}
+                </div>
 
-                {{--
-                delivery_type
-                national_id
-                national_id_attachment
-                national_id_expired
-                license_id
-                license_id_attachment
-                license_id_expired
-                license_car
-                license_car_attachment
-                license_car_expire
-                --}}
+                <div class="form-group row">
+                    <label class="col-sm-2 col-from-label">
+                        {{ translate('National ID Expired') }}
+                        <span class="text-danger">*</span>
+                    </label>
+                    <div class="col-sm-10">
+                        <input type="date" class="form-control" name="national_id_expired"
+                            value="{{ old('national_id_expired') }}" required>
+                    </div>
+                </div>
+
+                <div class="form-group row">
+                    <label class="col-sm-2 col-from-label">
+                        {{ translate('License ID') }}
+                        <span class="text-danger">*</span>
+                    </label>
+                    <div class="col-sm-10">
+                        <input type="text" class="form-control" name="license_id" value="{{ old('license_id') }}"
+                            placeholder="{{ translate('License ID') }}" required>
+                    </div>
+                </div>
+
+                <div class="form-group row">
+                    <label class="col-sm-2 col-from-label">
+                        {{ translate('License ID Expired') }}
+                        <span class="text-danger">*</span>
+                    </label>
+                    <div class="col-sm-10">
+                        <input type="date" class="form-control" name="license_id_expired"
+                            value="{{ old('license_id_expired') }}" required>
+                    </div>
+                </div>
+
+                <div class="form-group row">
+                    <label class="col-sm-2 col-from-label">
+                        {{ translate('License Car') }}
+                        <span class="text-danger">*</span>
+                    </label>
+                    <div class="col-sm-10">
+                        <input type="text" class="form-control" name="license_car" value="{{ old('license_car') }}"
+                            placeholder="{{ translate('License Car') }}" required>
+                    </div>
+                </div>
+
+                <div class="form-group row">
+                    <label class="col-sm-2 col-from-label">
+                        {{ translate('License Car Expired') }}
+                        <span class="text-danger">*</span>
+                    </label>
+                    <div class="col-sm-10">
+                        <input type="date" class="form-control" name="license_car_expired"
+                            value="{{ old('license_car_expired') }}" required>
+                    </div>
+                </div>
 
                 <div class="form-group mb-3 text-right">
                     <button type="submit" class="btn btn-primary">{{translate('Save')}}</button>

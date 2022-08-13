@@ -50,10 +50,13 @@ class User extends Authenticatable implements MustVerifyEmail
         'avatar_original	',
         'address',
         'country',
+        'country_id',
         'state',
+        'state_id',
         'city',
-        'zone',
         'city_id',
+        'zone',
+        'zone_id',
         'postal_code',
         'phone',
         'balance',
@@ -65,7 +68,6 @@ class User extends Authenticatable implements MustVerifyEmail
         'created_at',
         'updated_at',
         'delivery_type',
-        'zone_id',
         'national_id',
         'national_id_attachment',
         'national_id_expired',
@@ -74,7 +76,7 @@ class User extends Authenticatable implements MustVerifyEmail
         'license_id_expired',
         'license_car',
         'license_car_attachment',
-        'license_car_expire',
+        'license_car_expired',
     ];
 
     /**

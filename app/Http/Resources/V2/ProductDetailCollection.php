@@ -74,7 +74,9 @@ class ProductDetailCollection extends ResourceCollection
                     'main_price' => format_price(convert_price($data->main_price)),
                     'calculable_price' => $calculable_price,
                     'currency_symbol' => currency_symbol(),
-                    'current_stock' => (int)$data->stocks->first()->qty,
+
+                    'current_stock' => $data->stocks->first() ? (int)$data->stocks->first()->qty : 0,
+
                     'unit' => $data->unit,
                     'rating' => (float)$data->rating,
                     'rating_count' => (int)Review::where(['product_id' => $data->id])->count(),

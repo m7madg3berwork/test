@@ -47,7 +47,7 @@ class AuthController extends Controller
                 'user_type'              => $request->user_type,
                 'active'                 => 0,
                 'delivery_type'          => $request->delivery_type,
-                'zone_id'                => $request->zone_id,
+                'state_id'               => $request->state_id,
                 'national_id'            => $request->national_id,
                 'national_id_attachment' => $request->national_id_attachment,
                 'national_id_expired'    => $request->national_id_expired,
@@ -90,7 +90,7 @@ class AuthController extends Controller
                     'commercial_registry'        => $request->commercial_registry,
                     'tax_number_certificate'     => $request->tax_number_certificate,
                     'tax_number'                 => $request->tax_number,
-                    'city_id'                    => $request->city_id,
+                    'state_id'                   => $request->state_id,
                 ]);
             }
             Customer::create([

@@ -54,8 +54,7 @@ class DeliveryBoyController extends Controller
     {
         $countries = Country::where('status', 1)
             ->get();
-        $zones = Zone::all();
-        return view('delivery_boys.create', compact('countries', 'zones'));
+        return view('delivery_boys.create', compact('countries'));
     }
 
     /**
@@ -67,22 +66,23 @@ class DeliveryBoyController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'name'       => 'required',
-            'phone'      => 'required',
-            'country_id' => 'required',
-            'state_id'   => 'required',
+            'name'                   => 'required',
+            'phone'                  => 'required',
+            'country_id'             => 'required',
+            'state_id'               => 'required',
+            'delivery_type'          => 'required',
+            'national_id'            => 'required',
+            // 'national_id_attachment' => 'required',
+            'national_id_expired'    => 'required',
+            'license_id'             => 'required',
+            // 'license_id_attachment'  => 'required',
+            'license_id_expired'     => 'required',
+            'license_car'            => 'required',
+            // 'license_car_attachment' => 'required',
+            'license_car_expired'    => 'required',
         ]);
 
-        $country = Country::where('id', $request->country_id)->first();
-        $state   = State::where('id', $request->state_id)->first();
-
-        $user = new User;
-        $user->user_type = 'delivery_boy';
-        $user->name      = $request->name;
-        $user->phone     = $request->phone;
-        $user->country   = $country->name;
-        $user->state     = $state->name;
-        $user->save();
+        $user = User::create($request->all());
 
         $delivery_boy = new DeliveryBoy;
         $delivery_boy->user_id = $user->id;
@@ -112,12 +112,10 @@ class DeliveryBoyController extends Controller
     public function edit($id)
     {
         $countries = Country::where('status', 1)->get();
-        $states = State::where('status', 1)->get();
-        $cities = City::where('status', 1)->get();
-        $zones = Zone::all();
+        $states    = State::where('status', 1)->get();
         $delivery_boy = User::findOrFail($id);
 
-        return view('delivery_boys.edit', compact('delivery_boy', 'countries', 'states', 'cities', 'zones'));
+        return view('delivery_boys.edit', compact('delivery_boy', 'countries', 'states'));
     }
 
     /**
@@ -132,24 +130,38 @@ class DeliveryBoyController extends Controller
         $delivery_boy = User::findOrFail($id);
 
         $request->validate([
-            'name'       => 'required',
-            'phone'      => 'required',
-            'country_id' => 'required',
-            'state_id'   => 'required',
+            'name'                   => 'required',
+            'phone'                  => 'required',
+            'country_id'             => 'required',
+            'state_id'               => 'required',
+            'delivery_type'          => 'required',
+            'national_id'            => 'required',
+            // 'national_id_attachment' => 'required',
+            'national_id_expired'    => 'required',
+            'license_id'             => 'required',
+            // 'license_id_attachment'  => 'required',
+            'license_id_expired'     => 'required',
+            'license_car'            => 'required',
+            // 'license_car_attachment' => 'required',
+            'license_car_expired'    => 'required',
         ]);
 
-        $country = Country::where('id', $request->country_id)->first();
-        $state = State::where('id', $request->state_id)->first();
-
-        $delivery_boy->name    = $request->name;
-        $delivery_boy->phone   = $request->phone;
-        $delivery_boy->country = $country->name;
-        $delivery_boy->state   = $state->name;
+        $delivery_boy->name                = $request->name;
+        $delivery_boy->phone               = $request->phone;
+        $delivery_boy->country_id          = $request->country_id;
+        $delivery_boy->state_id            = $request->state_id;
+        $delivery_boy->delivery_type       = $request->delivery_type;
+        $delivery_boy->national_id         = $request->national_id;
+        $delivery_boy->national_id_expired = $request->national_id_expired;
+        $delivery_boy->license_id          = $request->license_id;
+        $delivery_boy->license_id_expired  = $request->license_id_expired;
+        $delivery_boy->license_car         = $request->license_car;
+        $delivery_boy->license_car_expired = $request->license_car_expired;
 
         $delivery_boy->save();
 
         flash(translate('Delivery Boy has been updated successfully'))->success();
-        return back();
+        return redirect()->route('delivery-boys.index');
     }
 
     /**

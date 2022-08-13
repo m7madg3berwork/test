@@ -9,6 +9,7 @@ use App\Models\Cart;
 use App\Models\City;
 use App\Models\PickupPoint;
 use App\Models\Product;
+use App\Models\State;
 use App\Models\Zone;
 use Illuminate\Http\Request;
 
@@ -28,9 +29,9 @@ class ShippingController extends Controller
         $address = Address::find($id);
 
         // get Zone
-        $zone = Zone::find($address->zone_id);
+        $state = State::find($address->state_id);
 
-        $cost = auth()->user()->customer_type == 'wholesale' ? $zone->seller_cost : $zone->customer_cost;
+        $cost = auth()->user()->customer_type == 'wholesale' ? $state->wholesaler_cost : $state->retailer_cost;
 
         return response()->json(
             [

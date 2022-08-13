@@ -76,10 +76,10 @@ class ProductController extends Controller
             $address = auth()->user()->addresses()->first();
 
             // get product zone based on address
-            $zone = $products[0]->zones->where("zone_id", $address->zone_id)->first();
+            $state = $products[0]->states->where("state_id", $address->state_id)->first();
 
             // add product cost based on zone
-            $products[0]->main_price = $zone->cost;
+            $products[0]->main_price = $state->cost;
 
             return new ProductDetailCollection($products);
         } catch (\Exception $e) {

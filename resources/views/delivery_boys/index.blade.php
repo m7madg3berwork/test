@@ -38,6 +38,13 @@
                     <th data-breakpoints="lg">#</th>
                     <th>{{translate('Name')}}</th>
                     <th data-breakpoints="lg">{{translate('Phone')}}</th>
+                    <th data-breakpoints="lg">{{translate('Delivery Type')}}</th>
+                    <th data-breakpoints="lg">{{translate('National ID')}}</th>
+                    <th data-breakpoints="lg">{{translate('National ID Expired')}}</th>
+                    <th data-breakpoints="lg">{{translate('License_ ID')}}</th>
+                    <th data-breakpoints="lg">{{translate('License ID Expired')}}</th>
+                    <th data-breakpoints="lg">{{translate('License Car')}}</th>
+                    <th data-breakpoints="lg">{{translate('License Car Expired')}}</th>
                     <th>{{translate('Earning')}}</th>
                     <th>{{translate('Collection')}}</th>
                     <th>{{ translate('Active') }}</th>
@@ -57,9 +64,14 @@
                         @endif
                         {{$delivery_boy->user->name}}
                     </td>
-                    <td>
-                        {{$delivery_boy->user->phone}}
-                    </td>
+                    <td>{{ $delivery_boy->user->phone }}</td>
+                    <td>{{ translate("Delivery Type " . $delivery_boy->user->delivery_type ) }}</td>
+                    <td>{{ $delivery_boy->user->national_id }}</td>
+                    <td>{{ $delivery_boy->user->national_id_expired }}</td>
+                    <td>{{ $delivery_boy->user->license_id }}</td>
+                    <td>{{ $delivery_boy->user->license_id_expired }}</td>
+                    <td>{{ $delivery_boy->user->license_car }}</td>
+                    <td>{{ $delivery_boy->user->license_car_expired }}</td>
                     <td>
                         {{ single_price($delivery_boy->total_earning) }}
                     </td>

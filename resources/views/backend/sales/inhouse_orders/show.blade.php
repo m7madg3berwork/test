@@ -100,22 +100,10 @@
                             <td class="text-right text-info text-bold">{{ $order_shipping_address->country }}</td>
                         </tr>
                         @endif
-                        @if ( isset($order_shipping_address->city))
-                        <tr>
-                            <td class="text-main text-bold">{{translate('City')}}</td>
-                            <td class="text-right text-info text-bold">{{ $order_shipping_address->city }}</td>
-                        </tr>
-                        @endif
                         @if ( isset($order_shipping_address->state))
                         <tr>
-                            <td class="text-main text-bold">{{translate('State')}}</td>
+                            <td class="text-main text-bold">{{translate('City')}}</td>
                             <td class="text-right text-info text-bold">{{ $order_shipping_address->state }}</td>
-                        </tr>
-                        @endif
-                        @if ( isset($order_shipping_address->zone))
-                        <tr>
-                            <td class="text-main text-bold">{{translate('Zone')}}</td>
-                            <td class="text-right text-info text-bold">{{ $order_shipping_address->zone }}</td>
                         </tr>
                         @endif
                         @if ( isset($order_shipping_address->address))
