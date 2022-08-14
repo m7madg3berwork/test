@@ -153,14 +153,16 @@ class WholesaleService
              */
             ProductsStates::where("product_id", $product->id)->delete();
             $states = $request->states;
-            if (count($states) > 0) {
-                foreach ($states as $state) {
-                    ProductsStates::create([
-                        'product_id' => $product->id,
-                        'state_id'   => $state['state_id'],
-                        'cost'       => $state['cost'],
-                        'qty'        => $state['qty'],
-                    ]);
+            if ($states != null) {
+                if (count($states) > 0) {
+                    foreach ($states as $state) {
+                        ProductsStates::create([
+                            'product_id' => $product->id,
+                            'state_id'   => $state['state_id'],
+                            'cost'       => $state['cost'],
+                            'qty'        => $state['qty'],
+                        ]);
+                    }
                 }
             }
 
@@ -355,14 +357,16 @@ class WholesaleService
          */
         ProductsStates::where("product_id", $product->id)->delete();
         $states = $request->states;
-        if (count($states) > 0) {
-            foreach ($states as $state) {
-                ProductsStates::create([
-                    'product_id' => $product->id,
-                    'state_id'   => $state['state_id'],
-                    'cost'       => $state['cost'],
-                    'qty'        => $state['qty'],
-                ]);
+        if ($states != null) {
+            if (count($states) > 0) {
+                foreach ($states as $state) {
+                    ProductsStates::create([
+                        'product_id' => $product->id,
+                        'state_id'   => $state['state_id'],
+                        'cost'       => $state['cost'],
+                        'qty'        => $state['qty'],
+                    ]);
+                }
             }
         }
 

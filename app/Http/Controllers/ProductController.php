@@ -191,54 +191,56 @@ class ProductController extends Controller
      */
     public function store(ProductRequest $request)
     {
-        // \DB::beginTransaction();
-        // try {
+        \DB::beginTransaction();
+        try {
 
-        $product = $this->productService->store($request->except([
-            '_token', 'sku', 'choice', 'tax_id', 'tax', 'tax_type', 'flash_deal_id', 'flash_discount', 'flash_discount_type',
-        ]));
+            $product = $this->productService->store($request->except([
+                '_token', 'sku', 'choice', 'tax_id', 'tax', 'tax_type', 'flash_deal_id', 'flash_discount', 'flash_discount_type',
+            ]));
 
-        //Product Stock
-        $this->productStockService->store($request->only([
-            'colors_active', 'colors', 'choice_no', 'unit_price', 'sku', 'current_stock', 'product_id',
-        ]), $product);
+            //Product Stock
+            $this->productStockService->store($request->only([
+                'colors_active', 'colors', 'choice_no', 'unit_price', 'sku', 'current_stock', 'product_id',
+            ]), $product);
 
-        /**
-         * Save States
-         */
-        ProductsStates::where("product_id", $product->id)->delete();
-        $states = $request->states;
-        if (count($states) > 0) {
-            foreach ($states as $state) {
-                ProductsStates::create([
-                    'product_id' => $product->id,
-                    'state_id'   => $state['state_id'],
-                    'cost'       => $state['cost'],
-                    'qty'        => $state['qty'],
-                ]);
+            /**
+             * Save States
+             */
+            ProductsStates::where("product_id", $product->id)->delete();
+            $states = $request->states;
+            if ($states != null) {
+                if (count($states) > 0) {
+                    foreach ($states as $state) {
+                        ProductsStates::create([
+                            'product_id' => $product->id,
+                            'state_id'   => $state['state_id'],
+                            'cost'       => $state['cost'],
+                            'qty'        => $state['qty'],
+                        ]);
+                    }
+                }
             }
+
+            // Product Translations
+            $request->merge(
+                [
+                    'lang' => env('DEFAULT_LANGUAGE')
+                ]
+            );
+            ProductTranslation::create($request->only([
+                'lang', 'name', 'unit', 'description', 'product_id',
+            ]));
+
+            flash(translate('Product has been inserted successfully'))->success();
+
+            \DB::commit();
+
+            return redirect()->route('products.admin');
+        } catch (\Exception $e) {
+            \DB::rollBack();
+            flash(translate('error in store product'))->error();
+            return redirect()->route('products.create');
         }
-
-        // Product Translations
-        $request->merge(
-            [
-                'lang' => env('DEFAULT_LANGUAGE')
-            ]
-        );
-        ProductTranslation::create($request->only([
-            'lang', 'name', 'unit', 'description', 'product_id',
-        ]));
-
-        flash(translate('Product has been inserted successfully'))->success();
-
-        // \DB::commit();
-
-        return redirect()->route('products.admin');
-        // } catch (\Exception $e) {
-        //     \DB::rollBack();
-        //     flash(translate('error in store product'))->error();
-        //     return redirect()->route('products.create');
-        // }
     }
 
     /**
@@ -339,17 +341,18 @@ class ProductController extends Controller
              */
             ProductsStates::where("product_id", $product->id)->delete();
             $states = $request->states;
-            if (count($states) > 0) {
-                foreach ($states as $state) {
-                    ProductsStates::create([
-                        'product_id' => $product->id,
-                        'state_id'   => $state['state_id'],
-                        'cost'       => $state['cost'],
-                        'qty'        => $state['qty'],
-                    ]);
+            if ($states != null) {
+                if (count($states) > 0) {
+                    foreach ($states as $state) {
+                        ProductsStates::create([
+                            'product_id' => $product->id,
+                            'state_id'   => $state['state_id'],
+                            'cost'       => $state['cost'],
+                            'qty'        => $state['qty'],
+                        ]);
+                    }
                 }
             }
-
 
             // Product Translations
             ProductTranslation::updateOrCreate(
