@@ -21,7 +21,8 @@ class CustomerController extends Controller
      */
     public function index(Request $request)
     {
-        $users = User::query()->withCount('orders')->whereHas("customer");
+        $users = User::query()->withCount('orders')
+            ->whereHas("customer");
         $users = $users->where('user_type', 'customer');
         if (isset($request->customer_type)) {
             $users = $users->where('customer_type', $request->customer_type);
@@ -142,11 +143,11 @@ class CustomerController extends Controller
      * @param int $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id)
+    public function destroy(Request $request, $id)
     {
         User::destroy($id);
         flash(translate('Customer has been deleted successfully'))->success();
-        return redirect()->route('customers.index');
+        return redirect()->back();
     }
 
     public function bulk_customer_delete(Request $request)

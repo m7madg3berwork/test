@@ -50,11 +50,11 @@
                         </th>
                         <th>{{translate('Name')}}</th>
                         <th>{{ translate('Active') }}</th>
-                        <th data-breakpoints="lg">{{translate('Email Address')}}</th>
+                        {{-- <th data-breakpoints="lg">{{translate('Email Address')}}</th> --}}
                         <th data-breakpoints="lg">{{translate('Phone')}}</th>
                         <th data-breakpoints="lg">{{translate('Package')}}</th>
                         <th data-breakpoints="lg">{{translate('Order Count')}}</th>
-                        <th data-breakpoints="lg">{{translate('Status')}}</th>
+                        {{-- <th data-breakpoints="lg">{{translate('Status')}}</th> --}}
                         <th data-breakpoints="lg">{{translate('Wallet Balance')}}</th>
                         <th data-breakpoints="lg" class="text-center">{{translate('Options')}}</th>
                     </tr>
@@ -85,7 +85,7 @@
                                 checked ' : '' }}>
                             </div>
                         </td>
-                        <td>{{$user->email}}</td>
+                        {{-- <td>{{$user->email}}</td> --}}
                         <td>{{$user->phone??'---'}}</td>
                         <td>
                             @if ($user->customer_package != null)
@@ -104,7 +104,7 @@
                             @endif
                         </td>
 
-                        @if($user->status == 'pending' || is_null($user->status))
+                        {{-- @if($user->status == 'pending' || is_null($user->status))
                         <td><span class="btn btn-warning btn-sm"
                                 style="font-size:13px; color: white;padding: 3px 5px;cursor: none;">{{translate('Pending')}}</span>
                         </td>
@@ -118,7 +118,7 @@
                                 style="font-size:13px; color: white; padding: 3px 5px;cursor: none;">{{translate('Active')}}</span>
                         </td>
                         @endif
-                        @endif
+                        @endif --}}
 
                         <td>{{single_price($user->funds->sum('amount')) ?? ''}}</td>
                         <td class="text-right">
@@ -132,7 +132,7 @@
                                 title="{{ translate('Customer Data') }}">
                                 <i class="las la-eye"></i>
                             </a>
-                            @if($user->banned == 1 || $user->status == 'pending' || is_null($user->status))
+                            {{-- @if($user->banned == 1 || $user->status == 'pending' || is_null($user->status))
                             <a href="#" class="btn btn-soft-success btn-icon btn-circle btn-sm"
                                 onclick="confirm_unban('{{route('customers.ban', encrypt($user->id))}}');"
                                 title="{{ translate('Active this Customer') }}">
@@ -144,7 +144,7 @@
                                 title="{{ translate('Block this Customer') }}">
                                 <i class="las la-user-slash"></i>
                             </a>
-                            @endif
+                            @endif --}}
                             <a href="#" class="btn btn-soft-danger btn-icon btn-circle btn-sm confirm-delete"
                                 data-href="{{route('customers.destroy', $user->id)}}" title="{{ translate('Delete') }}">
                                 <i class="las la-trash"></i>

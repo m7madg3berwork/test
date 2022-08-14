@@ -97,12 +97,18 @@ class OrderController extends Controller
     public function all_orders_show($id)
     {
         $order = Order::findOrFail(decrypt($id));
+
+        $subtotal = $order->orderDetails->sum('price');
+        $tax = (float)$subtotal * 15 / 100; // cal 15% tax
+        $subtotal -= $tax;
+
         $order_shipping_address = json_decode($order->shipping_address);
+
         $delivery_boys = User::where('city', $order_shipping_address->city)
             ->where('user_type', 'delivery_boy')
             ->get();
 
-        return view('backend.sales.all_orders.show', compact('order', 'delivery_boys'));
+        return view('backend.sales.all_orders.show', compact('order', 'delivery_boys', 'subtotal', 'tax'));
     }
 
     // Inhouse Orders
@@ -110,31 +116,34 @@ class OrderController extends Controller
     {
         //CoreComponentRepository::instantiateShopRepository();
 
-        $date = $request->date;
-        $payment_status = null;
+        $date            = $request->date;
+        $payment_status  = null;
         $delivery_status = null;
-        $sort_search = null;
-        $admin_user_id = User::where('user_type', 'admin')->first()->id;
-        $orders = Order::orderBy('id', 'desc')
-            ->where('seller_id', $admin_user_id);
+        $sort_search     = null;
+        $admin_user_id   = User::where('user_type', 'admin')->first()->id;
+        $orders          = Order::orderBy('id', 'desc')->where('seller_id', $admin_user_id);
 
         if ($request->payment_type != null) {
             $orders = $orders->where('payment_status', $request->payment_type);
             $payment_status = $request->payment_type;
         }
+
         if ($request->delivery_status != null) {
             $orders = $orders->where('delivery_status', $request->delivery_status);
             $delivery_status = $request->delivery_status;
         }
+
         if ($request->has('search')) {
             $sort_search = $request->search;
             $orders = $orders->where('code', 'like', '%' . $sort_search . '%');
         }
+
         if ($date != null) {
             $orders = $orders->whereDate('created_at', '>=', date('Y-m-d', strtotime(explode(" to ", $date)[0])))->whereDate('created_at', '<=', date('Y-m-d', strtotime(explode(" to ", $date)[1])));
         }
 
         $orders = $orders->paginate(15);
+
         return view('backend.sales.inhouse_orders.index', compact('orders', 'payment_status', 'delivery_status', 'sort_search', 'admin_user_id', 'date'));
     }
 
