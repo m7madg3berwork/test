@@ -89,8 +89,6 @@
     <script src="{{ static_asset('assets/js/vendors.js') }}"></script>
     <script src="{{ static_asset('assets/js/aiz-core.js') }}"></script>
 
-    @yield('script')
-
     <script type="text/javascript">
         @foreach (session('flash_notification', collect())->toArray() as $message)
             AIZ.plugins.notify('{{ $message['level'] }}', '{{ $message['message'] }}');
@@ -143,7 +141,6 @@
             }
     </script>
 
-
     <script>
         $.ajaxSetup({
             headers: {
@@ -184,6 +181,8 @@
             });
         }
     </script>
+
+    @yield('script')
 </body>
 
 </html>

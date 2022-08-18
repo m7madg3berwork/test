@@ -162,7 +162,7 @@
                                 <i class="las la-plus"></i>
                             </button>
                             &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                            <span>{{ translate('Total Price') }}: <span id="totalPrice">0.0</span></span>
+                            <span>{{ translate('Total Price') }}: <span id="totalPrice">0</span></span>
                         </div>
                     </div>
 

@@ -203,20 +203,22 @@
                                 <select class="form-control aiz-selectpicker" name="products[]"
                                     id="productSelect{{ $counter }}" onchange="getProductPrice{{ $counter }}" required>
                                     <option value="">{{ translate('Select Product') }}</option>
-                                    @foreach ($products as $k => $v)
-                                    <option value="{{ $k }}" {{ $k==$product->id ? ' selected ' : '' }}>{{ $v['name'] }}
+                                    @foreach ($productsSort as $k => $v)
+                                    <option value="{{ $v['id'] }}" {{ $v['id']==$product->id ? ' selected ' : '' }}>{{
+                                        $v['name'] }}
                                     </option>
                                     @endforeach
                                 </select>
                             </div>
                             <div class="col-md-4">
                                 <input type="number" lang="{{ $lang }}" id="productQty{{ $counter }}" min="0" step="1"
-                                    value="{{ $product->pivot->qty }}" name="qty[]" required
+                                    value="{{ $product->pivot->qty }}" oninput="calcPrice()" name="qty[]" required
                                     placeholder="{{ translate('Enter Quantity') }}" class="form-control">
                             </div>
                             <div class="col-md-4 d-flex justify-content-between align-items-center">
-                                <p class="m-0">{{ translate('Price') }}: <span class="productPrice"
-                                        id="productPrice{{ $counter }}">{{ $products[$product->id]['price'] }}</span>
+                                <p class="m-0">{{ translate('Price') }}: <span index="{{ $counter }}"
+                                        class="productPrice" id="productPrice{{ $counter }}">{{
+                                        $products[$product->id]['price'] }}</span>
                                 </p>
                                 <button type="button" onclick="deleteProductFunction({{ $counter }})"
                                     class="btn btn-soft-primary btn-icon btn-circle btn-sm"

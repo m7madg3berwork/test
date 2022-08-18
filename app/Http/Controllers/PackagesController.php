@@ -42,10 +42,12 @@ class PackagesController extends Controller
             ];
         }
         $products = $newproducts;
+        $productsSort = $products;
+        array_multisort(array_column($productsSort, 'name'), SORT_ASC, SORT_NATURAL | SORT_FLAG_CASE, $productsSort);
 
         $states = State::where("status", "1")->get()->pluck('name', 'id')->toArray();
 
-        return view('backend.packages.create', compact('products', 'states'));
+        return view('backend.packages.create', compact('products', 'productsSort', 'states'));
     }
 
     /**
@@ -136,13 +138,13 @@ class PackagesController extends Controller
             ];
         }
         $products = $newproducts;
+        $productsSort = $products;
+        array_multisort(array_column($productsSort, 'name'), SORT_ASC, SORT_NATURAL | SORT_FLAG_CASE, $productsSort);
 
         $states = State::where("status", "1")->get()->pluck('name', 'id')->toArray();
         $states_ids = PackagesStates::where('package_id', $id)->pluck('state_id')->toArray();
 
-
-
-        return view('backend.packages.edit', compact('package', 'lang', 'products', 'states', 'states_ids'));
+        return view('backend.packages.edit', compact('package', 'lang', 'products', 'productsSort', 'states', 'states_ids'));
     }
 
     /**
