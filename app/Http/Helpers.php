@@ -425,7 +425,7 @@ if (!function_exists('home_discounted_base_price_by_stock_id')) {
 if (!function_exists('home_discounted_base_price')) {
     function home_discounted_base_price($product, $formatted = true)
     {
-        $price = $product->unit_price;
+        $price = $product->main_price;
         $tax = 0;
 
         $discount_applicable = false;

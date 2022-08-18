@@ -64,10 +64,8 @@ class AuthController extends Controller
         } else {
             // customer
             if ($request->customer_type == 'retail') {
-
                 $code = generateOTPCode();
                 sendOTPMessage($request->email_or_phone, $code);
-
                 $user = User::create([
                     'name'              => $request->name,
                     'phone'             => $request->email_or_phone,
@@ -104,8 +102,6 @@ class AuthController extends Controller
             'user_id' => $user->id
         ]);
     }
-
-
 
     public function login(Request $request)
     {

@@ -85,7 +85,7 @@ class ProductController extends Controller
         } catch (\Exception $e) {
             return response()->json([
                 'result'  => false,
-                'message' => translate('This product not allowed in your zone.')
+                'message' => translate('This product not allowed in your city.')
             ]);
         }
     }
@@ -206,55 +206,67 @@ class ProductController extends Controller
 
     public function category($id, Request $request)
     {
-
-        $auth = $request->header('auth');
-        if ($auth && $auth != null) {
-            try {
-
-                $token = PersonalAccessToken::findToken($auth)->first();
-                if (!$token) 'Token not found';
-                $user = $token->tokenable;
-                // if($user)return $user;
-                // else return 'User not found';
-
-            } catch (\Throwable $th) {
-                //throw $th;
-                return response()->json([
-                    'message' => 'User not found',
-                    'code' => 404
-                ]);
-            }
-        }
-
         $category_ids = CategoryUtility::children_ids($id);
         $category_ids[] = $id;
 
-        if ($request->customer_type == 1) {
-            $products = Product::whereIn('category_id', $category_ids)->where('wholesale_product', 1)->physical();
-        } else {
-            $products = Product::whereIn('category_id', $category_ids)->where('wholesale_product', 0)->physical();
-        }
-
-
+        $products = Product::whereIn('category_id', $category_ids)
+            ->physical();
 
         if ($request->name != "" || $request->name != null) {
             $products = $products->where('name', 'like', '%' . $request->name . '%');
         }
 
-        $products = filter_products($products)->latest()->paginate(10);
+        $products = filter_products($products)
+            ->latest()
+            ->paginate(10);
 
-        if (count($products) > 0) {
-            if ($request->header('auth')) {
-                foreach ($products as $key => $product) {
-                    $product['zone_price'] = 0;
-                    if (count($product->zones) != 0) {
-                        $product['zone_price'] = $product->zones->where('zone_id', auth()->user()->city_id)->first()->cost;
-                    }
-                }
-            }
+        foreach ($products as $product) {
+            $product->main_price = $product->unit_price;
         }
 
         return new ProductMiniCollection($products);
+    }
+    public function authcategory($id, Request $request)
+    {
+        try {
+            $state_id = auth()->user()->addresses()->first()->state_id;
+
+            $category_ids = CategoryUtility::children_ids($id);
+            $category_ids[] = $id;
+
+            $products = Product::whereIn('category_id', $category_ids)
+                ->whereHas('states', function ($q) use ($state_id) {
+                    $q->where("state_id", $state_id);
+                });
+
+            if (auth()->user()->customer_type == 1) {
+                $products = $products->where('wholesale_product', 1)
+                    ->physical();
+            } else {
+                $products = $products
+                    ->where('wholesale_product', 0)
+                    ->physical();
+            }
+
+            if ($request->name != "" || $request->name != null) {
+                $products = $products->where('name', 'like', '%' . $request->name . '%');
+            }
+
+            $products = filter_products($products)->latest()->paginate(10);
+
+            foreach ($products as $product) {
+                $state = $product->states->where("state_id", $state_id)->first();
+                $product->main_price = $state->cost;
+                $product->state_qty  = $state->qty;
+            }
+
+            return new ProductMiniCollection($products);
+        } catch (\Exception $e) {
+            return response()->json([
+                'result'  => false,
+                'message' => translate('Oops..')
+            ]);
+        }
     }
 
 

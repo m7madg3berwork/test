@@ -25,16 +25,17 @@ class StorePackageRequest extends FormRequest
     public function rules()
     {
         return [
-            'name' => ['required','string'],
-            'qty' => ['required','integer'],
-            'price' => ['required','regex:/^[0-9]+(\.[0-9][0-9]?)?$/'],
-            'customer_type' => ['required', Rule::in('wholesale','retail')],
-            'shipping_type' => ['required', Rule::in('weekly','monthly')],
-            'duration' => ['required','integer'],
-            'visits_num' => ['required','integer'],
-            'products' => ['sometimes','array'],
-            'products.*' => ['required','exists:products,id'],
+            'name' => ['required', 'string'],
             'desc' => ['required'],
+            'price' => ['required', 'regex:/^[0-9]+(\.[0-9][0-9]?)?$/'],
+            'customer_type' => ['required', Rule::in('wholesale', 'retail')],
+            'shipping_type' => ['required', Rule::in('weekly', 'monthly')],
+            'duration' => ['required', 'integer'],
+            'visits_num' => ['required', 'integer'],
+            'products' => ['required', 'array'],
+            'qty' => ['required', 'array'],
+            'states' => ['required', 'array'],
+            'states.*' => ['required', 'exists:states,id'],
         ];
     }
 }

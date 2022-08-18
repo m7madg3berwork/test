@@ -6,8 +6,10 @@ use App\Http\Requests\StorePackageRequest;
 use App\Http\Requests\UpdatePackageRequest;
 use App\Models\Package;
 use App\Models\PackageItem;
+use App\Models\PackagesStates;
 use App\Models\PackageTranslation;
 use App\Models\Product;
+use App\Models\State;
 use Illuminate\Http\Request;
 
 class PackagesController extends Controller
@@ -19,7 +21,7 @@ class PackagesController extends Controller
      */
     public function index()
     {
-        $packages = Package::all();
+        $packages = Package::where("active", "1")->get();
         return view('backend.packages.index', compact('packages'));
     }
 
@@ -30,9 +32,20 @@ class PackagesController extends Controller
      */
     public function create()
     {
-        $products = Product::select('id','name' , 'unit_price')->orderBy('id','DESC')->get();
-        return view('backend.packages.create', compact('products'));
+        $products = Product::get(['id', 'name', 'unit_price']);
+        $newproducts = [];
+        foreach ($products as $product) {
+            $newproducts[$product->id] = [
+                'id'    => $product->id,
+                'name'  => $product->name,
+                'price' => $product->unit_price
+            ];
+        }
+        $products = $newproducts;
 
+        $states = State::where("status", "1")->get()->pluck('name', 'id')->toArray();
+
+        return view('backend.packages.create', compact('products', 'states'));
     }
 
     /**
@@ -43,27 +56,45 @@ class PackagesController extends Controller
      */
     public function store(StorePackageRequest $request)
     {
-        if ($request->has('is_active')) {
-            $request->is_active = 1;
-        }else{
-            $request->is_active = 0;
-        }
-
-        $data = [];
-        $package = new Package();
         \DB::beginTransaction();
         try {
-            $request->request->add(['user_id' => \Auth::id(), 'added_by' => 'admin']);
-            $data = $request->except('_token','products');
-            $package = $package->create($data);
-            $package->products()->sync($request->products);
 
-            $customer_package_translation = PackageTranslation::firstOrNew(['lang' => env('DEFAULT_LANGUAGE'), 'package_id' => $package->id]);
-            $customer_package_translation->name = $request->name;
-            $customer_package_translation->save();
+            $data = $request->except(['states', 'products', 'qty']);
+            $data['active']   = ($request->has('active') ? 1 : 0);
+            $data['added_by'] = 'admin';
+            $data['user_id']  = auth()->user()->id;
+
+            // create package
+            $package = Package::create($data);
+
+            // store trans
+            PackageTranslation::create([
+                'lang'       => app()->getLocale(),
+                'package_id' => $package->id,
+                'name'       => $request->name,
+                'desc'       => $request->desc
+            ]);
+
+            // store states
+            $states = $request->states;
+            if ($states != null) {
+                $package->states()->sync($request->states);
+            }
+
+            // store products
+            $products = $request->products;
+            $qty = $request->qty;
+            if ($products != null && $qty != null) {
+                for ($i = 0; $i < count($products); $i++) {
+                    PackageItem::create([
+                        'package_id' => $package->id,
+                        'product_id' => $products[$i],
+                        'qty'        => $qty[$i]
+                    ]);
+                }
+            }
 
             \DB::commit();
-
             flash(translate('Package has been inserted successfully'))->success();
             return redirect()->route('packages.index');
         } catch (\Exception $e) {
@@ -90,14 +121,28 @@ class PackagesController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function edit(Request $request,$id)
+    public function edit(Request $request, $id)
     {
         $lang = $request->lang;
         $package = Package::findOrFail($id);
-        $products = Product::select('id','name')->orderBy('id','DESC')->get();
-        $product_ids = PackageItem::where('package_id',$id)->pluck('product_id')->toArray();
-        return view('backend.packages.edit', compact('package', 'lang', 'products','product_ids'));
 
+        $products = Product::get(['id', 'name', 'unit_price']);
+        $newproducts = [];
+        foreach ($products as $product) {
+            $newproducts[$product->id] = [
+                'id'    => $product->id,
+                'name'  => $product->name,
+                'price' => $product->unit_price
+            ];
+        }
+        $products = $newproducts;
+
+        $states = State::where("status", "1")->get()->pluck('name', 'id')->toArray();
+        $states_ids = PackagesStates::where('package_id', $id)->pluck('state_id')->toArray();
+
+
+
+        return view('backend.packages.edit', compact('package', 'lang', 'products', 'states', 'states_ids'));
     }
 
     /**
@@ -109,23 +154,58 @@ class PackagesController extends Controller
      */
     public function update(UpdatePackageRequest $request, $id)
     {
-        $data = array();
-        $package = new Package();
         \DB::beginTransaction();
         try {
-            if ($request->lang == env("DEFAULT_LANGUAGE")) {
-                $request->request->add(['name' => $request->name]);
-            }
-            $data = $request->except("_token","_method","lang","products");
-            $package = $package->updateOrCreate(['id' => $id],$data);
-            $package->products()->sync($request->products);
 
-            $customer_package_translation = PackageTranslation::firstOrNew(['lang' => $request->lang, 'package_id' => $id]);
-            $customer_package_translation->name = $request->name;
-            $customer_package_translation->save();
+            $data = $request->except(['states', 'products', 'qty']);
+            $data['active'] = ($request->has('active') ? 1 : 0);
+
+            // create package
+            $package = Package::findOrFail($id);
+            $package->price         = $request->price;
+            $package->logo          = $request->logo;
+            $package->customer_type = $request->customer_type;
+            $package->shipping_type = $request->shipping_type;
+            $package->duration      = $request->duration;
+            $package->visits_num    = $request->visits_num;
+            $package->active        = $request->active;
+            $package->save();
+
+            // store trans
+            $translation = PackageTranslation::firstOrNew(
+                [
+                    'lang'       => $request->lang,
+                    'package_id' => $package->id
+                ]
+            );
+            $translation->name = $request->name;
+            $translation->desc = $request->desc;
+            $translation->save();
+
+            // store states
+            PackagesStates::where("package_id", $id)->delete();
+            $states = $request->states;
+            if ($states != null) {
+                $package->states()->sync($request->states);
+            }
+
+            // store products
+            PackageItem::where("package_id", $id)->delete();
+            $products = $request->products;
+            $qty = $request->qty;
+            if ($products != null && $qty != null) {
+                for ($i = 0; $i < count($products); $i++) {
+                    PackageItem::create([
+                        'package_id' => $package->id,
+                        'product_id' => $products[$i],
+                        'qty'        => $qty[$i]
+                    ]);
+                }
+            }
+
             \DB::commit();
             flash(translate('Package has been updated successfully'))->success();
-            return back();
+            return redirect()->route('packages.index');
         } catch (\Exception $e) {
             \DB::rollBack();
             flash(translate($e->getMessage()))->error();
@@ -142,13 +222,14 @@ class PackagesController extends Controller
     public function destroy($id)
     {
         $package = Package::findOrFail($id);
-        foreach ($package->package_translations as $key => $package_translation) {
-            $package_translation->delete();
-        }
-        Package::destroy($id);
+
+        PackageTranslation::where("package_id", $id)->delete();
+        PackagesStates::where("package_id", $id)->delete();
+        PackageItem::where("package_id", $id)->delete();
+
+        $package->delete();
 
         flash(translate('Package has been deleted successfully'))->success();
         return redirect()->route('packages.index');
-
     }
 }
