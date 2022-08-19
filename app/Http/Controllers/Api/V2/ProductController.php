@@ -80,6 +80,7 @@ class ProductController extends Controller
 
             // add product cost based on zone
             $products[0]->main_price = $state->cost;
+            $products[0]->qty = $state->qty;
 
             return new ProductDetailCollection($products);
         } catch (\Exception $e) {
@@ -95,6 +96,7 @@ class ProductController extends Controller
         try {
             $products = Product::where("id", $id)->get();
             $products[0]->main_price = $products[0]->unit_price;
+            $products[0]->qty = $products[0]->states->sum('qty');
             return new ProductDetailCollection($products);
         } catch (\Exception $e) {
             return response()->json([
@@ -212,6 +214,16 @@ class ProductController extends Controller
         $products = Product::whereIn('category_id', $category_ids)
             ->physical();
 
+        $customer_type = $request->customer_type;
+        if ($customer_type != null) {
+            if ($customer_type == 'wholesale') {
+                $products = $products->where('wholesale_product', 1);
+            } else {
+                $products = $products
+                    ->where('wholesale_product', 0);
+            }
+        }
+
         if ($request->name != "" || $request->name != null) {
             $products = $products->where('name', 'like', '%' . $request->name . '%');
         }
@@ -222,10 +234,12 @@ class ProductController extends Controller
 
         foreach ($products as $product) {
             $product->main_price = $product->unit_price;
+            $product->qty = $product->states->sum('qty');
         }
 
         return new ProductMiniCollection($products);
     }
+
     public function authcategory($id, Request $request)
     {
         try {
@@ -257,7 +271,7 @@ class ProductController extends Controller
             foreach ($products as $product) {
                 $state = $product->states->where("state_id", $state_id)->first();
                 $product->main_price = $state->cost;
-                $product->state_qty  = $state->qty;
+                $product->qty  = $state->qty;
             }
 
             return new ProductMiniCollection($products);
@@ -374,31 +388,68 @@ class ProductController extends Controller
 
     public function featured(Request $request)
     {
-        $auth = $request->header('auth');
-        if ($auth && $auth != null) {
-            try {
+        try {
+            $products = Product::where('featured', 1);
 
-                $token = PersonalAccessToken::findToken($auth)->first();
-                if (!$token) 'Token not found';
-                $user = $token->tokenable;
-                // if($user)return $user;
-                // else return 'User not found';
-
-            } catch (\Throwable $th) {
-                //throw $th;
-                return response()->json([
-                    'message' => 'User not found',
-                    'code' => 404
-                ]);
+            if ($request->customer_type == 'wholesale') {
+                $products = $products->where('wholesale_product', 1);
+            } else {
+                $products = $products->where('wholesale_product', 0);
             }
-        }
 
-        if ($request->customer_type == 1) {
-            $products = Product::where('featured', 1)->where('wholesale_product', 1)->physical();
-        } else {
-            $products = Product::where('featured', 1)->where('wholesale_product', 0)->physical();
+            $products = filter_products($products)
+                ->latest()
+                ->paginate(10);
+
+            foreach ($products as $product) {
+                $product->main_price = $product->unit_price;
+                $product->qty  = $product->states->sum('qty');
+            }
+
+            return new ProductMiniCollection($products);
+        } catch (\Exception $e) {
+            return response()->json([
+                'result'  => false,
+                'message' => translate('Oops..')
+            ]);
         }
-        return new ProductMiniCollection(filter_products($products)->latest()->paginate(10));
+    }
+    public function authFeatured(Request $request)
+    {
+        try {
+            $state_id = auth()->user()->addresses()->first()->state_id;
+
+            $products = Product::where('featured', 1)
+                ->whereHas('states', function ($q) use ($state_id) {
+                    $q->where("state_id", $state_id);
+                });
+
+            if (auth()->user()->customer_type == 1) {
+                $products = $products->where('wholesale_product', 1)
+                    ->physical();
+            } else {
+                $products = $products
+                    ->where('wholesale_product', 0)
+                    ->physical();
+            }
+
+            $products = filter_products($products)
+                ->latest()
+                ->paginate(10);
+
+            foreach ($products as $product) {
+                $state = $product->states->where("state_id", $state_id)->first();
+                $product->main_price = $state->cost;
+                $product->qty  = $state->qty;
+            }
+
+            return new ProductMiniCollection($products);
+        } catch (\Exception $e) {
+            return response()->json([
+                'result'  => false,
+                'message' => translate('Oops..')
+            ]);
+        }
     }
 
     public function bestSeller(Request $request)

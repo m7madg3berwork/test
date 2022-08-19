@@ -20,20 +20,22 @@ class ProductMiniCollection extends ResourceCollection
                     'stroked_price'     => home_base_price($data),
 
                     'main_price'        => format_price(convert_price($data->main_price)),
-                    'city_qty'          => $data->state_qty,
+                    'current_stock'     => $data->qty,
 
                     'rating'            => (float) $data->rating,
                     'sales'             => (int) $data->num_of_sale,
                     'unit'              => $data->unit,
 
                     'category' => [
-                        'id'            => $data->category->id,
-                        'name'          => $data->category->getTranslation('name')
+                        'id'            => $data->category != null ? $data->category->id : '',
+                        'name'          => $data->category != null ? $data->category->getTranslation('name') : ''
                     ],
+
                     'brand' => [
-                        'id'            => $data->brand->id,
-                        'brand_name'    => $data->brand->getTranslation('name')
+                        'id'            => $data->brand != null ? $data->brand->id : '',
+                        'brand_name'    => $data->brand != null ? $data->brand->getTranslation('name') : ''
                     ],
+
                     'links' => [
                         'details'       => route('products.show', $data->id),
                     ]

@@ -75,7 +75,7 @@ class ProductDetailCollection extends ResourceCollection
                     'calculable_price' => $calculable_price,
                     'currency_symbol' => currency_symbol(),
 
-                    'current_stock' => $data->stocks->first() ? (int)$data->stocks->first()->qty : 0,
+                    'current_stock' => $data->qty,
 
                     'unit' => $data->unit,
                     'rating' => (float)$data->rating,

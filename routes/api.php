@@ -171,7 +171,10 @@ Route::group(['prefix' => 'v2', 'middleware' => ['app_language']], function () {
     Route::get('products/sub-sub-category/{id}', 'App\Http\Controllers\Api\V2\ProductController@subSubCategory')->name('products.subSubCategory');
     Route::get('products/brand/{id}', 'App\Http\Controllers\Api\V2\ProductController@brand')->name('api.products.brand');
     Route::get('products/todays-deal', 'App\Http\Controllers\Api\V2\ProductController@todaysDeal');
+
     Route::get('products/featured', 'App\Http\Controllers\Api\V2\ProductController@featured');
+    Route::get('products/auth/featured', 'App\Http\Controllers\Api\V2\ProductController@authFeatured')->middleware('auth:sanctum');
+
     Route::get('products/best-seller', 'App\Http\Controllers\Api\V2\ProductController@bestSeller');
     Route::get('products/related/{id}', 'App\Http\Controllers\Api\V2\ProductController@related')->name('products.related');
 

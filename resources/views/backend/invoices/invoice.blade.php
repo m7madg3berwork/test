@@ -147,8 +147,10 @@
 					@foreach ($order->orderDetails as $key => $orderDetail)
 					@if ($orderDetail->product != null)
 					<tr class="">
-						<td>{{ $orderDetail->product->name }} @if($orderDetail->variation != null) ({{
-							$orderDetail->variation }}) @endif</td>
+						<td>
+							{{ $orderDetail->product->name }}
+						</td>
+
 						<td>
 							@if ($order->shipping_type != null && $order->shipping_type ==
 							'home_delivery')
@@ -160,11 +162,15 @@
 							@endif
 							@endif
 						</td>
+
 						<td class="">{{ $orderDetail->quantity }}</td>
+
 						<td class="currency">{{ single_price($orderDetail->price/$orderDetail->quantity) }}
 						</td>
+
 						<td class="currency">{{ single_price($orderDetail->tax/$orderDetail->quantity) }}
 						</td>
+
 						<td class="text-right currency">{{
 							single_price($orderDetail->price+$orderDetail->tax) }}</td>
 					</tr>
