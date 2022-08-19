@@ -142,7 +142,7 @@
                         <div class="col-md-9">
                             <select
                                 class="form-control aiz-selectpicker {{ $errors->has('states.*') ? 'is-invalid' : '' }}"
-                                required multiple name="states[]">
+                                data-live-search="true" required multiple name="states[]">
                                 <option id="">{{translate('Select City')}}</option>
                                 @foreach($states as $k => $v)
                                 <option value="{{ $k }}">{{ $v }}</option>

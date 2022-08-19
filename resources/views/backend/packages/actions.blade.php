@@ -47,7 +47,7 @@
         var content = `
         <div class="form-group row" id="productRecord`+index+`">
         <div class="col-md-4">  
-            <select class="form-control aiz-selectpicker" name="products[]" id="productSelect`+index+`"
+            <select class="form-control aiz-selectpicker" name="products[]" id="productSelect`+index+`" data-live-search="true"
                 onchange="getProductPrice(`+index+`)" required>
                 <option value="">{{ translate('Select Product') }}</option>`;
             

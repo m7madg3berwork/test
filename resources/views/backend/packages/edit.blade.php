@@ -164,7 +164,7 @@
                     <div class="form-group row">
                         <label class="col-md-3 col-from-label">{{translate('Cities')}}</label>
                         <div class="col-md-9">
-                            <select
+                            <select data-live-search="true"
                                 class="form-control aiz-selectpicker {{ $errors->has('states.*') ? 'is-invalid' : '' }}"
                                 required multiple name="states[]">
                                 <option id="">{{translate('Select City')}}</option>
@@ -200,7 +200,7 @@
                         @foreach ($package->products as $product)
                         <div class="form-group row" id="productRecord{{ $counter }}">
                             <div class="col-md-4">
-                                <select class="form-control aiz-selectpicker" name="products[]"
+                                <select class="form-control aiz-selectpicker" name="products[]" data-live-search="true"
                                     id="productSelect{{ $counter }}" onchange="getProductPrice{{ $counter }}" required>
                                     <option value="">{{ translate('Select Product') }}</option>
                                     @foreach ($productsSort as $k => $v)
