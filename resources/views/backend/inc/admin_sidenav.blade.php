@@ -865,61 +865,69 @@
                                 <span class="aiz-side-nav-text">{{translate('Currency')}}</span>
                             </a>
                         </li>
-                        <li class="aiz-side-nav-item">
+
+                        {{-- <li class="aiz-side-nav-item">
                             <a href="{{route('tax.index')}}"
                                 class="aiz-side-nav-link {{ areActiveRoutes(['tax.index', 'tax.create', 'tax.store', 'tax.show', 'tax.edit'])}}">
                                 <span class="aiz-side-nav-text">{{translate('Vat & TAX')}}</span>
                             </a>
-                        </li>
+                        </li> --}}
 
                         <li class="aiz-side-nav-item">
                             <a href="{{ route('smtp_settings.index') }}" class="aiz-side-nav-link">
                                 <span class="aiz-side-nav-text">{{translate('SMTP Settings')}}</span>
                             </a>
                         </li>
+
                         {{-- <li class="aiz-side-nav-item">--}}
                             {{-- <a href="{{ route('payment_method.index') }}" class="aiz-side-nav-link">--}}
                                 {{-- <span class="aiz-side-nav-text">{{translate('Payment Methods')}}</span>--}}
                                 {{-- </a>--}}
                             {{-- </li>--}}
-                        <li class="aiz-side-nav-item">
+
+                        {{-- <li class="aiz-side-nav-item">
                             <a href="{{ route('order_configuration.index') }}" class="aiz-side-nav-link">
                                 <span class="aiz-side-nav-text">{{translate('Order Configuration')}}</span>
                             </a>
-                        </li>
+                        </li> --}}
+
                         <li class="aiz-side-nav-item">
                             <a class="aiz-side-nav-link" href="{{route('offer_daily_qty.create')}}">
                                 <span class="aiz-side-nav-text">{{translate('Quantification of Offer Daily')}}</span>
                             </a>
                         </li>
+
                         {{-- <li class="aiz-side-nav-item">--}}
                             {{-- <a href="{{ route('file_system.index') }}" class="aiz-side-nav-link">--}}
                                 {{-- <span--}} {{-- class="aiz-side-nav-text">{{translate('File System & Cache
                                     Configuration')}}</span>--}}
                                     {{-- </a>--}}
                             {{-- </li>--}}
-                        <li class="aiz-side-nav-item">
+
+                        {{-- <li class="aiz-side-nav-item">
                             <a href="{{ route('social_login.index') }}" class="aiz-side-nav-link">
                                 <span class="aiz-side-nav-text">{{translate('Social media Logins')}}</span>
                             </a>
-                        </li>
-                        <li class="aiz-side-nav-item">
+                        </li> --}}
+
+                        {{-- <li class="aiz-side-nav-item">
                             <a href="{{ route('google-firebase.index') }}" class="aiz-side-nav-link">
                                 <span class="aiz-side-nav-text">{{translate('Google Firebase')}}</span>
                             </a>
-                        </li>
+                        </li> --}}
+
                         <li class="aiz-side-nav-item">
                             <a href="{{route('pick_up_points.index')}}"
                                 class="aiz-side-nav-link {{ areActiveRoutes(['pick_up_points.index','pick_up_points.create','pick_up_points.edit'])}}">
                                 <span class="aiz-side-nav-text">{{translate('Pickup point')}}</span>
                             </a>
                         </li>
-                        <li class="aiz-side-nav-item">
+
+                        {{-- <li class="aiz-side-nav-item">
                             <a href="{{route('activation.index')}}" class="aiz-side-nav-link">
                                 <span class="aiz-side-nav-text">{{translate('Features activation')}}</span>
                             </a>
-                        </li>
-
+                        </li> --}}
 
                         {{-- <li class="aiz-side-nav-item">--}}
                             {{-- <a href="javascript:void(0);" class="aiz-side-nav-link">--}}
@@ -983,7 +991,7 @@
 
 
                 <!--OTP addon -->
-                @if (addon_is_activated('otp_system'))
+                {{-- @if (addon_is_activated('otp_system'))
                 @if(Auth::user()->user_type == 'admin' || in_array('19',
                 json_decode(Auth::user()->staff->role->permissions)))
                 <li class="aiz-side-nav-item">
@@ -1014,7 +1022,8 @@
                     </ul>
                 </li>
                 @endif
-                @endif
+                @endif --}}
+
                 <!-- Support -->
                 @if(Auth::user()->user_type == 'admin' || in_array('12',
                 json_decode(Auth::user()->staff->role->permissions)))
@@ -1139,9 +1148,7 @@
                 @endif
                 @endif
 
-
-
-                @if(Auth::user()->user_type == 'admin' || in_array('24',
+                {{-- @if(Auth::user()->user_type == 'admin' || in_array('24',
                 json_decode(Auth::user()->staff->role->permissions)))
                 <li class="aiz-side-nav-item">
                     <a href="#" class="aiz-side-nav-link">
@@ -1162,10 +1169,10 @@
                         </li>
                     </ul>
                 </li>
-                @endif
+                @endif --}}
 
                 <!-- Addon Manager -->
-                @if(Auth::user()->user_type == 'admin' || in_array('21',
+                {{-- @if(Auth::user()->user_type == 'admin' || in_array('21',
                 json_decode(Auth::user()->staff->role->permissions)))
                 <li class="aiz-side-nav-item">
                     <a href="{{route('addons.index')}}"
@@ -1174,7 +1181,8 @@
                         <span class="aiz-side-nav-text">{{translate('Addon Manager')}}</span>
                     </a>
                 </li>
-                @endif
+                @endif --}}
+
             </ul><!-- .aiz-side-nav -->
         </div><!-- .aiz-side-nav-wrap -->
     </div><!-- .aiz-sidebar -->

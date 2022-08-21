@@ -50,8 +50,8 @@ function sendOTPMessage($to, $msg)
  */
 function generateOTPCode()
 {
-    return 1234;
-    // return rand(1111, 9999);
+    // return 1234;
+    return rand(1111, 9999);
 }
 
 //sensSMS function for OTP

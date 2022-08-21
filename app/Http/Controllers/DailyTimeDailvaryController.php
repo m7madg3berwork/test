@@ -48,19 +48,18 @@ class DailyTimeDailvaryController extends Controller
                 ]);
         }
 
-        for ($i=0 ; $i < 7 ; $i++) {
-            if (in_array($i , $request->days)) {
+        for ($i = 0; $i < 7; $i++) {
+            if (in_array($i, $request->days)) {
                 WeekDays::where('id', $i)
-                ->update([
-                    'active' => 1
-                ]);
-            }else {
+                    ->update([
+                        'active' => 1
+                    ]);
+            } else {
                 WeekDays::where('id', $i)
-                ->update([
-                    'active' => 0
-                ]);
+                    ->update([
+                        'active' => 0
+                    ]);
             }
-
         }
 
 
