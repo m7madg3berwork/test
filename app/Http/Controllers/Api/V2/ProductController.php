@@ -96,7 +96,7 @@ class ProductController extends Controller
         try {
             $products = Product::where("id", $id)->get();
             $products[0]->main_price = $products[0]->unit_price;
-            $products[0]->qty = $products[0]->states->sum('qty');
+            $products[0]->qty        = $products[0]->states->sum('qty');
             return new ProductDetailCollection($products);
         } catch (\Exception $e) {
             return response()->json([

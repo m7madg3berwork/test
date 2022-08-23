@@ -12,6 +12,7 @@ use App\Http\Resources\V2\CountriesCollection;
 use App\Http\Resources\V2\ZonesCollection;
 use Illuminate\Http\Request;
 use App\Models\Cart;
+use App\Models\Product;
 use App\Models\State;
 use App\Models\Zone;
 
@@ -127,16 +128,49 @@ class AddressController extends Controller
                         'address_id' => $request->address_id
                     ]
                 );
+
+            $carts = Cart::where("user_id", auth()->user()->id)->get();
+
+            $arr = [];
+            foreach ($carts as $cart) {
+                $product = Product::findOrFail($cart->product_id);
+                $address = Address::findOrFail($request->address_id);
+                $state = State::find($address->state_id);
+                $stateProduct = $product->states->where("state_id", $state->id)->first();
+                Cart::where('user_id', auth()->user()->id)
+                    ->where('product_id', $product->id)
+                    ->update(
+                        [
+                            'price' => $stateProduct->cost,
+                            'shipping_cost' => auth()->user()->customer_type == 'wholesale' ? $state->wholesaler_cost : $state->retailer_cost
+                        ]
+                    );
+                if ($stateProduct->qty < $cart->quantity) {
+                    $arr[] = 1;
+                }
+            }
+
+            if (count($arr) > 0) {
+                return response()->json(
+                    [
+                        'result' => false,
+                        'message' => translate('Address is updated but some products not available please process again.')
+                    ]
+                );
+            }
+
+            return response()->json(
+                [
+                    'result' => true,
+                    'message' => translate('Address is updated')
+                ]
+            );
         } catch (\Exception $e) {
             return response()->json([
                 'result' => false,
                 'message' => translate('Could not save the address')
             ]);
         }
-        return response()->json([
-            'result' => true,
-            'message' => translate('Address is saved')
-        ]);
     }
 
     public function getCities()

@@ -286,19 +286,8 @@ if (!function_exists('home_price')) {
 if (!function_exists('home_discounted_price')) {
     function home_discounted_price($product, $formatted = true)
     {
-        $lowest_price = $product->unit_price;
-        $highest_price = $product->unit_price;
-
-        if ($product->variant_product) {
-            foreach ($product->stocks as $key => $stock) {
-                if ($lowest_price > $stock->price) {
-                    $lowest_price = $stock->price;
-                }
-                if ($highest_price < $stock->price) {
-                    $highest_price = $stock->price;
-                }
-            }
-        }
+        $lowest_price = $product->main_price;
+        $highest_price = $product->main_price;
 
         $discount_applicable = false;
 

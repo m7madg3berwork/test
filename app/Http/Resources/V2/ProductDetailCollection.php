@@ -66,7 +66,16 @@ class ProductDetailCollection extends ResourceCollection
                     'photos' => $photos,
                     'thumbnail_image' => uploaded_asset($data->thumbnail_img),
                     'tags' => explode(',', $data->tags),
-                    'price_high_low' => (float)explode('-', home_discounted_base_price($data, false))[0] == (float)explode('-', home_discounted_price($data, false))[1] ? format_price((float)explode('-', home_discounted_price($data, false))[0]) : "From " . format_price((float)explode('-', home_discounted_price($data, false))[0]) . " to " . format_price((float)explode('-', home_discounted_price($data, false))[1]),
+
+                    'price_high_low' =>
+                    (float)explode('-', home_discounted_base_price($data, false))[0] == (float)explode('-', home_discounted_price($data, false))[1]
+
+                        ?
+
+                        format_price((float)explode('-', home_discounted_price($data, false))[0])
+
+                        : "From " . format_price((float)explode('-', home_discounted_price($data, false))[0]) . " to " . format_price((float)explode('-', home_discounted_price($data, false))[1]),
+
                     'choice_options' => $this->convertToChoiceOptions(json_decode($data->choice_options)),
                     'colors' => json_decode($data->colors),
                     'has_discount' => home_base_price($data, false) != home_discounted_base_price($data, false),
