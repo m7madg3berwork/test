@@ -106,21 +106,14 @@ class CustomerController extends Controller
             $imageName = '';
 
             if ($user->customer_type == 'wholesale') {
-                $commercial_registry = $user->commercial_registry;
-                $file_name = 'user' . $user->id . '.png'; //generating unique file name;
-
-                // extract the image extension
-                preg_match("/data:image\/(.*?);/", $commercial_registry, $image_extension);
-
-                // remove the type part
-                $commercial_registry = preg_replace('/data:image\/(.*?);base64,/', '', $commercial_registry);
-
-                $commercial_registry = str_replace(' ', '+', $commercial_registry);
-
-                //generating unique file name;
-                $imageName = 'user' . $user->id . '.' . $image_extension[1];
-
-                Storage::disk('public')->put($imageName, base64_decode($commercial_registry));
+                if ($user->commercial_registry != null) {
+                    $commercial_registry = $user->commercial_registry;
+                    preg_match("/data:image\/(.*?);/", $commercial_registry, $image_extension);
+                    $commercial_registry = preg_replace('/data:image\/(.*?);base64,/', '', $commercial_registry);
+                    $commercial_registry = str_replace(' ', '+', $commercial_registry);
+                    $imageName = 'user' . $user->id . '.' . $image_extension[1];
+                    Storage::disk('public')->put($imageName, base64_decode($commercial_registry));
+                }
             }
 
             if ($user) {

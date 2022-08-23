@@ -85,28 +85,6 @@
             </div>
             <div class="col-md-6">
                 <div class="form-group row">
-                    <label class="col-md-4 col-form-label" style="font-weight: bold">{{ translate('Commercial Name')
-                        }}</label>
-                    <div class="col-md-8">
-                        <input readonly type="text" class="form-control" placeholder="{{ translate('Commercial Name')}}"
-                            name="commercial_name" value="{{ $user->commercial_name ?? ''}}">
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-6">
-                <div class="form-group row">
-                    <label class="col-md-4 col-form-label" style="font-weight: bold">{{ translate('Commercial
-                        Registration No.')
-                        }}</label>
-                    <div class="col-md-8">
-                        <input readonly type="text" class="form-control"
-                            placeholder="{{ translate('Commercial Registration No.')}}"
-                            name="commercial_registration_no" value="{{ $user->commercial_registration_no ?? ''}}">
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-6">
-                <div class="form-group row">
                     <label class="col-md-4 col-form-label" style="font-weight: bold">{{ translate('Tax Number')
                         }}</label>
                     <div class="col-md-8">
@@ -129,6 +107,28 @@
             </div>
         </div>
         <div class="row">
+            <div class="col-md-6">
+                <div class="form-group row">
+                    <label class="col-md-4 col-form-label" style="font-weight: bold">{{ translate('Commercial Name')
+                        }}</label>
+                    <div class="col-md-8">
+                        <input readonly type="text" class="form-control" placeholder="{{ translate('Commercial Name')}}"
+                            name="commercial_name" value="{{ $user->commercial_name ?? ''}}">
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="form-group row">
+                    <label class="col-md-4 col-form-label" style="font-weight: bold">{{ translate('Commercial
+                        Registration No.')
+                        }}</label>
+                    <div class="col-md-8">
+                        <input readonly type="text" class="form-control"
+                            placeholder="{{ translate('Commercial Registration No.')}}"
+                            name="commercial_registration_no" value="{{ $user->commercial_registration_no ?? ''}}">
+                    </div>
+                </div>
+            </div>
             <div class="col-md-6">
                 <div class="form-group row">
                     <label class="col-md-4 col-form-label" style="font-weight: bold">{{ translate('Commercial Registry')

@@ -176,6 +176,47 @@
     </div>
 </div>
 
+<div class="card">
+    <div class="card-header">
+        <h5 class="mb-0 h6">{{ translate('Attachments')}}</h5>
+    </div>
+    <div class="card-body">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="form-group row">
+                    <label class="col-md-4 col-form-label" style="font-weight: bold">{{ translate('National Id
+                        Attachment')
+                        }}</label>
+                    <div class="col-md-8">
+                        <img src="{{ asset($imageNationalIdAttachment) }}" class="rounded float-start" alt="...">
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-12">
+                <div class="form-group row">
+                    <label class="col-md-4 col-form-label" style="font-weight: bold">{{ translate('License Id
+                        Attachment')
+                        }}</label>
+                    <div class="col-md-8">
+                        <img src="{{ asset($imageLicenseIdAttachment) }}" class="rounded float-start" alt="...">
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-12">
+                <div class="form-group row">
+                    <label class="col-md-4 col-form-label" style="font-weight: bold">{{ translate('License Car
+                        Attachment')
+                        }}</label>
+                    <div class="col-md-8">
+                        <img src="{{ asset($imageLicenseCarAttachment) }}" class="rounded float-start" alt="...">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
 @endsection
 
 @section('script')
