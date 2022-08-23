@@ -254,12 +254,12 @@
                     <tr>
                         <td><strong class="text-muted">{{translate('Sub Total')}} :</strong></td>
                         <td>
-                            {{ single_price($order->orderDetails->sum('price')) }}
+                            {{ single_price($subtotal) }}
                         </td>
                     </tr>
                     <tr>
                         <td><strong class="text-muted">{{translate('Tax')}} :</strong></td>
-                        <td>{{ single_price($order->orderDetails->sum('tax')) }}</td>
+                        <td>{{ single_price($tax) }}</td>
                     </tr>
                     <tr>
                         <td><strong class="text-muted"> {{translate('Shipping')}} :</strong></td>

@@ -30,10 +30,12 @@ class AdminController extends Controller
             sendOTPMessage($user->phone, translate('Your account is activated now you can login.'));
         }
 
-        return response()->json([
-            'userId' => $userId,
-            'active' => $active
-        ]);
+        return response()->json(
+            [
+                'userId' => $userId,
+                'active' => $active
+            ]
+        );
     }
 
     /**

@@ -155,14 +155,18 @@ class OrderController extends Controller
 
             $query = User::where('user_type', 'delivery_boy');
             if (!empty($order_shipping_address)) {
-                $query->where('city_id', $order_shipping_address->zone_id);
+                $query->where('state_id', $order_shipping_address->state_id);
             }
             $delivery_boys = $query->get();
 
             $order->viewed = 1;
             $order->save();
 
-            return view('backend.sales.inhouse_orders.show', compact('order', 'delivery_boys', 'order_shipping_address'));
+            $subtotal = $order->orderDetails->sum('price');
+            $tax = (float)$subtotal * 15 / 100; // cal 15% tax
+            $subtotal -= $tax;
+
+            return view('backend.sales.inhouse_orders.show', compact('order', 'delivery_boys', 'order_shipping_address', 'subtotal', 'tax'));
         } catch (\Exception $e) {
             return redirect(route('inhouse_orders.index'));
         }

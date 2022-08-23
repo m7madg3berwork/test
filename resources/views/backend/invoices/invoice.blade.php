@@ -119,7 +119,7 @@
 					<td class="strong">{{ $shipping_address->name }}</td>
 				</tr>
 				<tr>
-					<td class="gry-color small">{{ $shipping_address->address }}, {{ $shipping_address->city
+					<td class="gry-color small">{{ $shipping_address->address }}, {{ $shipping_address->state
 						}}, {{ $shipping_address->postal_code }}, {{ $shipping_address->country }}</td>
 				</tr>
 				<tr>

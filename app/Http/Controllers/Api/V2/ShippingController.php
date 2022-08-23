@@ -28,10 +28,12 @@ class ShippingController extends Controller
         // get address
         $address = Address::find($id);
 
-        // get Zone
+        // get State
         $state = State::find($address->state_id);
 
         $cost = auth()->user()->customer_type == 'wholesale' ? $state->wholesaler_cost : $state->retailer_cost;
+
+        $cost = ($cost != null) ? $cost : 0;
 
         return response()->json(
             [
