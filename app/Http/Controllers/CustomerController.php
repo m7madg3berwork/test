@@ -111,8 +111,10 @@ class CustomerController extends Controller
                     preg_match("/data:image\/(.*?);/", $commercial_registry, $image_extension);
                     $commercial_registry = preg_replace('/data:image\/(.*?);base64,/', '', $commercial_registry);
                     $commercial_registry = str_replace(' ', '+', $commercial_registry);
-                    $imageName = 'user' . $user->id . '.' . $image_extension[1];
-                    Storage::disk('public')->put($imageName, base64_decode($commercial_registry));
+                    if (count($image_extension) > 1) {
+                        $imageName = 'user' . $user->id . '.' . $image_extension[1];
+                        Storage::disk('public')->put($imageName, base64_decode($commercial_registry));
+                    }
                 }
             }
 

@@ -115,29 +115,38 @@ class DeliveryBoyController extends Controller
         $states    = State::where('status', 1)->get();
         $delivery_boy = User::findOrFail($id);
 
+        $imageNationalIdAttachment = '';
         if ($delivery_boy->national_id_attachment != null) {
             $national_id_attachment = $delivery_boy->national_id_attachment;
             preg_match("/data:image\/(.*?);/", $national_id_attachment, $image_extension);
             $national_id_attachment = preg_replace('/data:image\/(.*?);base64,/', '', $national_id_attachment);
             $national_id_attachment = str_replace(' ', '+', $national_id_attachment);
-            $imageNationalIdAttachment = 'user' . $delivery_boy->id . '_1.' . $image_extension[1];
-            Storage::disk('public')->put($imageNationalIdAttachment, base64_decode($national_id_attachment));
+            if (count($image_extension) > 1) {
+                $imageNationalIdAttachment = 'user' . $delivery_boy->id . '_1.' . $image_extension[1];
+                Storage::disk('public')->put($imageNationalIdAttachment, base64_decode($national_id_attachment));
+            }
         }
+        $imageLicenseIdAttachment = '';
         if ($delivery_boy->license_id_attachment != null) {
             $license_id_attachment = $delivery_boy->license_id_attachment;
             preg_match("/data:image\/(.*?);/", $license_id_attachment, $image_extension);
             $license_id_attachment = preg_replace('/data:image\/(.*?);base64,/', '', $license_id_attachment);
             $license_id_attachment = str_replace(' ', '+', $license_id_attachment);
-            $imageLicenseIdAttachment = 'user' . $delivery_boy->id . '_2.' . $image_extension[1];
-            Storage::disk('public')->put($imageLicenseIdAttachment, base64_decode($license_id_attachment));
+            if (count($image_extension) > 1) {
+                $imageLicenseIdAttachment = 'user' . $delivery_boy->id . '_2.' . $image_extension[1];
+                Storage::disk('public')->put($imageLicenseIdAttachment, base64_decode($license_id_attachment));
+            }
         }
+        $imageLicenseCarAttachment = '';
         if ($delivery_boy->license_car_attachment != null) {
             $license_car_attachment = $delivery_boy->license_car_attachment;
             preg_match("/data:image\/(.*?);/", $license_car_attachment, $image_extension);
             $license_car_attachment = preg_replace('/data:image\/(.*?);base64,/', '', $license_car_attachment);
             $license_car_attachment = str_replace(' ', '+', $license_car_attachment);
-            $imageLicenseCarAttachment = 'user' . $delivery_boy->id . '_3.' . $image_extension[1];
-            Storage::disk('public')->put($imageLicenseCarAttachment, base64_decode($license_car_attachment));
+            if (count($image_extension) > 1) {
+                $imageLicenseCarAttachment = 'user' . $delivery_boy->id . '_3.' . $image_extension[1];
+                Storage::disk('public')->put($imageLicenseCarAttachment, base64_decode($license_car_attachment));
+            }
         }
 
         return view('delivery_boys.edit', compact('delivery_boy', 'countries', 'states', 'imageNationalIdAttachment', 'imageLicenseIdAttachment', 'imageLicenseCarAttachment'));
