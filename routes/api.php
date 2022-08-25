@@ -59,16 +59,38 @@ Route::group(['prefix' => 'v2', 'middleware' => ['app_language']], function () {
     //IIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII
     Route::get('get-daily-time-delivery', 'App\Http\Controllers\Api\V2\DailyTimeDailvaryController@index');
     //IIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII
+
+    Route::group(['prefix' => 'packages'], function () {
+
+        Route::get('get/all', 'App\Http\Controllers\Api\V2\PackageController@getAll');
+
+        Route::get('auth/get/all', 'App\Http\Controllers\Api\V2\PackageController@authGetAll')->middleware('auth:sanctum');
+
+        Route::get('get/{id}', 'App\Http\Controllers\Api\V2\PackageController@getPackage');
+
+        Route::post('subscribe', 'App\Http\Controllers\Api\V2\PackageController@subscribe')->middleware('auth:sanctum');
+
+        Route::get('my/subscribed', 'App\Http\Controllers\Api\V2\PackageController@mySubscribed')->middleware('auth:sanctum');
+
+        Route::get('hyperpay-get-checkoutId/{id}', 'App\Http\Controllers\Api\V2\HyperpayController@getPackageCheckoutId')->middleware('auth:sanctum');
+
+        Route::post('hyperpay-get-paymentStatus', 'App\Http\Controllers\Api\V2\HyperpayController@getPackagePaymentStatus')->middleware('auth:sanctum');
+    });
+
     Route::get('get-admin-packages', 'App\Http\Controllers\Api\V2\PackageController@adminPackages');
+
     Route::get('get-admin-package/{id}', 'App\Http\Controllers\Api\V2\PackageController@adminPackage')->name('get.admin.package');
 
     Route::post('user/subscribe-package', 'App\Http\Controllers\Api\V2\PackageController@subscribePackage')->middleware('auth:sanctum');
+
     Route::get('user/subscribed-package-show/{package_id}', 'App\Http\Controllers\Api\V2\PackageController@subscribePackageShow')->middleware('auth:sanctum');
 
     Route::get('get-user-packages', 'App\Http\Controllers\Api\V2\PackageController@userPackages')->middleware('auth:sanctum');
+
     Route::get('get-user-package/{id}', 'App\Http\Controllers\Api\V2\PackageController@userPackage')->middleware('auth:sanctum');
 
     Route::post('user/package', 'App\Http\Controllers\Api\V2\PackageController@add')->middleware('auth:sanctum');
+
     Route::post('user/package/items', 'App\Http\Controllers\Api\V2\PackageController@addPackageItem')->middleware('auth:sanctum');
 
     Route::post('user/package/items/update', 'App\Http\Controllers\Api\V2\PackageController@process')->middleware('auth:sanctum');

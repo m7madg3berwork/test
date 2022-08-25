@@ -72,17 +72,35 @@ class DeliveryBoyController extends Controller
             'state_id'               => 'required',
             'delivery_type'          => 'required',
             'national_id'            => 'required',
-            // 'national_id_attachment' => 'required',
+            'national_id_attachment' => 'required|file|mimes:jpeg,jpg,png,gif|max:10000',
             'national_id_expired'    => 'required',
             'license_id'             => 'required',
-            // 'license_id_attachment'  => 'required',
+            'license_id_attachment'  => 'required|file|mimes:jpeg,jpg,png,gif|max:10000',
             'license_id_expired'     => 'required',
             'license_car'            => 'required',
-            // 'license_car_attachment' => 'required',
+            'license_car_attachment' => 'required|file|mimes:jpeg,jpg,png,gif|max:10000',
             'license_car_expired'    => 'required',
         ]);
 
-        $user = User::create($request->all());
+        $data = $request->all();
+
+        if ($request->hasFile('national_id_attachment')) {
+            $national_id_attachment = $request->file('national_id_attachment');
+            $ex = $national_id_attachment->getClientOriginalExtension();
+            $data['national_id_attachment'] = "data:image/$ex;base64," . base64_encode(file_get_contents($national_id_attachment));
+        }
+        if ($request->hasFile('license_id_attachment')) {
+            $license_id_attachment = $request->file('license_id_attachment');
+            $ex = $license_id_attachment->getClientOriginalExtension();
+            $data['license_id_attachment'] = "data:image/$ex;base64," . base64_encode(file_get_contents($license_id_attachment));
+        }
+        if ($request->hasFile('license_car_attachment')) {
+            $license_car_attachment = $request->file('license_car_attachment');
+            $ex = $license_car_attachment->getClientOriginalExtension();
+            $data['license_car_attachment'] = "data:image/$ex;base64," . base64_encode(file_get_contents($license_car_attachment));
+        }
+
+        $user = User::create($data);
 
         $delivery_boy = new DeliveryBoy;
         $delivery_boy->user_id = $user->id;
@@ -170,13 +188,13 @@ class DeliveryBoyController extends Controller
             'state_id'               => 'required',
             'delivery_type'          => 'required',
             'national_id'            => 'required',
-            // 'national_id_attachment' => 'required',
+            'national_id_attachment' => 'nullable|file|mimes:jpeg,jpg,png,gif|max:10000',
             'national_id_expired'    => 'required',
             'license_id'             => 'required',
-            // 'license_id_attachment'  => 'required',
+            'license_id_attachment'  => 'nullable|file|mimes:jpeg,jpg,png,gif|max:10000',
             'license_id_expired'     => 'required',
             'license_car'            => 'required',
-            // 'license_car_attachment' => 'required',
+            'license_car_attachment' => 'nullable|file|mimes:jpeg,jpg,png,gif|max:10000',
             'license_car_expired'    => 'required',
         ]);
 
@@ -191,6 +209,22 @@ class DeliveryBoyController extends Controller
         $delivery_boy->license_id_expired  = $request->license_id_expired;
         $delivery_boy->license_car         = $request->license_car;
         $delivery_boy->license_car_expired = $request->license_car_expired;
+
+        if ($request->hasFile('national_id_attachment')) {
+            $national_id_attachment = $request->file('national_id_attachment');
+            $ex = $national_id_attachment->getClientOriginalExtension();
+            $delivery_boy->national_id_attachment = "data:image/$ex;base64," . base64_encode(file_get_contents($national_id_attachment));
+        }
+        if ($request->hasFile('license_id_attachment')) {
+            $license_id_attachment = $request->file('license_id_attachment');
+            $ex = $license_id_attachment->getClientOriginalExtension();
+            $delivery_boy->license_id_attachment = "data:image/$ex;base64," . base64_encode(file_get_contents($license_id_attachment));
+        }
+        if ($request->hasFile('license_car_attachment')) {
+            $license_car_attachment = $request->file('license_car_attachment');
+            $ex = $license_car_attachment->getClientOriginalExtension();
+            $delivery_boy->license_car_attachment = "data:image/$ex;base64," . base64_encode(file_get_contents($license_car_attachment));
+        }
 
         $delivery_boy->save();
 

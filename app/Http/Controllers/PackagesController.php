@@ -21,7 +21,7 @@ class PackagesController extends Controller
      */
     public function index()
     {
-        $packages = Package::where("active", "1")->get();
+        $packages = Package::all();
         return view('backend.packages.index', compact('packages'));
     }
 

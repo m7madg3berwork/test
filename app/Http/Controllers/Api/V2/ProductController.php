@@ -73,7 +73,7 @@ class ProductController extends Controller
             $products = Product::where("id", $id)->get();
 
             // get first address
-            $address = auth()->user()->addresses()->first();
+            $address = auth()->user()->addresses()->where('set_default', 1)->first();
 
             // get product zone based on address
             $state = $products[0]->states->where("state_id", $address->state_id)->first();
@@ -243,7 +243,8 @@ class ProductController extends Controller
     public function authcategory($id, Request $request)
     {
         try {
-            $state_id = auth()->user()->addresses()->first()->state_id;
+            $address = auth()->user()->addresses()->where('set_default', 1)->first();
+            $state_id = $address->state_id;
 
             $category_ids = CategoryUtility::children_ids($id);
             $category_ids[] = $id;
@@ -417,7 +418,8 @@ class ProductController extends Controller
     public function authFeatured(Request $request)
     {
         try {
-            $state_id = auth()->user()->addresses()->first()->state_id;
+            $address = auth()->user()->addresses()->where('set_default', 1)->first();
+            $state_id = $address->state_id;
 
             $products = Product::where('featured', 1)
                 ->whereHas('states', function ($q) use ($state_id) {

@@ -139,7 +139,7 @@
                         <label class="col-md-3 col-from-label">{{ translate('active') }}</label>
                         <div class="col-md-9">
                             <label class="aiz-switch aiz-switch-success mb-0">
-                                <input type="checkbox" required name="active" value="{{ $package->active }}" checked="">
+                                <input type="checkbox" name="active" value="{{ $package->active }}" checked="">
                                 <span></span>
                             </label>
                         </div>

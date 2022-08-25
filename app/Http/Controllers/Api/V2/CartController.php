@@ -130,7 +130,7 @@ class CartController extends Controller
             $variant = $request->variant;
             $tax = 0;
 
-            $address = auth()->user()->addresses()->first();
+            $address = auth()->user()->addresses()->where('set_default', 1)->first();
             $state = State::find($address->state_id);
             $shipping_cost =  auth()->user()->customer_type == 'wholesale' ? $state->wholesaler_cost : $state->retailer_cost;
             $stateProduct = $product->states->where("state_id", $state->id)->first();
@@ -266,7 +266,9 @@ class CartController extends Controller
             $cart_ids = explode(",", $request->cart_ids);
             $cart_quantities = explode(",", $request->cart_quantities);
 
-            $state_id = auth()->user()->addresses()->first()->state_id;
+            $address = auth()->user()->addresses()->where('set_default', 1)->first();
+            $state_id = $address->state_id;
+
             $cart = Cart::where('user_id', auth()->user()->id)->first();
             if ($cart != null) {
                 if ($cart->address_id != 0) {

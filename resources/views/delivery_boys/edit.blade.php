@@ -2,13 +2,14 @@
 
 @section('content')
 
-<div class="col-lg-8 mx-auto">
+<div class="col-lg-10 mx-auto">
     <div class="card">
         <div class="card-header">
             <h5 class="mb-0 h6">{{translate('Delivery Boy Information')}}</h5>
         </div>
 
-        <form action="{{ route('delivery-boys.update', $delivery_boy->id) }}" method="POST">
+        <form action="{{ route('delivery-boys.update', $delivery_boy->id) }}" method="POST"
+            enctype="multipart/form-data">
             @csrf
             <input name="_method" type="hidden" value="PATCH">
             <div class="card-body">
@@ -24,33 +25,33 @@
                 @endif
 
                 <div class="form-group row">
-                    <label class="col-sm-2 col-from-label" for="name">
+                    <label class="col-sm-3 col-from-label" for="name">
                         {{translate('Name')}}
                         <span class="text-danger">*</span>
                     </label>
-                    <div class="col-sm-10">
+                    <div class="col-sm-9">
                         <input type="text" class="form-control" name="name" value="{{$delivery_boy->name}}"
                             placeholder="Name" required>
                     </div>
                 </div>
 
                 <div class="form-group row">
-                    <label class="col-sm-2 col-from-label" for="phone">
+                    <label class="col-sm-3 col-from-label" for="phone">
                         {{translate('Phone')}}
                         <span class="text-danger">*</span>
                     </label>
-                    <div class="col-sm-10">
+                    <div class="col-sm-9">
                         <input type="text" class="form-control" name="phone" value="{{$delivery_boy->phone}}"
                             placeholder="Phone" required>
                     </div>
                 </div>
 
                 <div class="form-group row">
-                    <label class="col-sm-2 col-from-label" for="type">
+                    <label class="col-sm-3 col-from-label" for="type">
                         {{translate('Delivery Type')}}
                         <span class="text-danger">*</span>
                     </label>
-                    <div class="col-sm-10">
+                    <div class="col-sm-9">
                         <select class="form-control aiz-selectpicker" data-live-search="true" name="delivery_type"
                             required>
                             <option value="">{{translate('Select Delivery Type')}}</option>
@@ -63,11 +64,11 @@
                 </div>
 
                 <div class="form-group row">
-                    <label class="col-sm-2 col-from-label" for="country">
+                    <label class="col-sm-3 col-from-label" for="country">
                         {{translate('Country')}}
                         <span class="text-danger">*</span>
                     </label>
-                    <div class="col-sm-10">
+                    <div class="col-sm-9">
                         <select class="form-control aiz-selectpicker" name="country_id" id="country_id" required>
                             <option value="">{{translate('Select Country')}}</option>
                             @foreach ($countries as $country)
@@ -81,13 +82,13 @@
                 </div>
 
                 <div class="row">
-                    <div class="col-md-2">
+                    <div class="col-sm-3">
                         <label>
                             {{ translate('City')}}
                             <span class="text-danger">*</span>
                         </label>
                     </div>
-                    <div class="col-md-10">
+                    <div class="col-sm-9">
                         <select class="form-control mb-3 aiz-selectpicker" name="state_id" id="edit_state"
                             data-live-search="true" required>
                             @foreach ($states as $key => $state)
@@ -100,11 +101,11 @@
                 </div>
 
                 <div class="form-group row">
-                    <label class="col-sm-2 col-from-label">
+                    <label class="col-sm-3 col-from-label">
                         {{ translate('National ID') }}
                         <span class="text-danger">*</span>
                     </label>
-                    <div class="col-sm-10">
+                    <div class="col-sm-9">
                         <input type="text" class="form-control" name="national_id"
                             value="{{ $delivery_boy->national_id }}" placeholder="{{ translate('National ID') }}"
                             required>
@@ -112,22 +113,32 @@
                 </div>
 
                 <div class="form-group row">
-                    <label class="col-sm-2 col-from-label">
+                    <label class="col-sm-3 col-from-label">
                         {{ translate('National ID Expired') }}
                         <span class="text-danger">*</span>
                     </label>
-                    <div class="col-sm-10">
+                    <div class="col-sm-9">
                         <input type="date" class="form-control" name="national_id_expired"
                             value="{{ $delivery_boy->national_id_expired }}" required>
                     </div>
                 </div>
 
                 <div class="form-group row">
-                    <label class="col-sm-2 col-from-label">
+                    <label class="col-sm-3 col-from-label">
+                        {{ translate('National ID Attachment') }}
+                        <span class="text-danger">*</span>
+                    </label>
+                    <div class="col-sm-9">
+                        <input type="file" class="form-control" name="national_id_attachment">
+                    </div>
+                </div>
+
+                <div class="form-group row">
+                    <label class="col-sm-3 col-from-label">
                         {{ translate('License ID') }}
                         <span class="text-danger">*</span>
                     </label>
-                    <div class="col-sm-10">
+                    <div class="col-sm-9">
                         <input type="text" class="form-control" name="license_id"
                             value="{{ $delivery_boy->license_id }}" placeholder="{{ translate('License ID') }}"
                             required>
@@ -135,22 +146,32 @@
                 </div>
 
                 <div class="form-group row">
-                    <label class="col-sm-2 col-from-label">
+                    <label class="col-sm-3 col-from-label">
                         {{ translate('License ID Expired') }}
                         <span class="text-danger">*</span>
                     </label>
-                    <div class="col-sm-10">
+                    <div class="col-sm-9">
                         <input type="date" class="form-control" name="license_id_expired"
                             value="{{ $delivery_boy->license_id_expired }}" required>
                     </div>
                 </div>
 
                 <div class="form-group row">
-                    <label class="col-sm-2 col-from-label">
+                    <label class="col-sm-3 col-from-label">
+                        {{ translate('License ID Attachment') }}
+                        <span class="text-danger">*</span>
+                    </label>
+                    <div class="col-sm-9">
+                        <input type="file" class="form-control" name="license_id_attachment">
+                    </div>
+                </div>
+
+                <div class="form-group row">
+                    <label class="col-sm-3 col-from-label">
                         {{ translate('License Car') }}
                         <span class="text-danger">*</span>
                     </label>
-                    <div class="col-sm-10">
+                    <div class="col-sm-9">
                         <input type="text" class="form-control" name="license_car"
                             value="{{ $delivery_boy->license_car }}" placeholder="{{ translate('License Car') }}"
                             required>
@@ -158,13 +179,23 @@
                 </div>
 
                 <div class="form-group row">
-                    <label class="col-sm-2 col-from-label">
+                    <label class="col-sm-3 col-from-label">
                         {{ translate('License Car Expired') }}
                         <span class="text-danger">*</span>
                     </label>
-                    <div class="col-sm-10">
+                    <div class="col-sm-9">
                         <input type="date" class="form-control" name="license_car_expired"
                             value="{{ $delivery_boy->license_car_expired }}" required>
+                    </div>
+                </div>
+
+                <div class="form-group row">
+                    <label class="col-sm-3 col-from-label">
+                        {{ translate('License Car Attachment') }}
+                        <span class="text-danger">*</span>
+                    </label>
+                    <div class="col-sm-9">
+                        <input type="file" class="form-control" name="license_car_attachment">
                     </div>
                 </div>
 
@@ -188,7 +219,8 @@
                         Attachment')
                         }}</label>
                     <div class="col-md-8">
-                        <img src="{{ asset($imageNationalIdAttachment) }}" class="rounded float-start" alt="...">
+                        <img src="{{ asset($imageNationalIdAttachment) }}" class="img-thumbnail rounded float-start"
+                            style="width:200px;height:200px;" alt="...">
                     </div>
                 </div>
             </div>
@@ -198,7 +230,8 @@
                         Attachment')
                         }}</label>
                     <div class="col-md-8">
-                        <img src="{{ asset($imageLicenseIdAttachment) }}" class="rounded float-start" alt="...">
+                        <img src="{{ asset($imageLicenseIdAttachment) }}" class="img-thumbnail rounded float-start"
+                            style="width:200px;height:200px;" alt="...">
                     </div>
                 </div>
             </div>
@@ -208,7 +241,8 @@
                         Attachment')
                         }}</label>
                     <div class="col-md-8">
-                        <img src="{{ asset($imageLicenseCarAttachment) }}" class="rounded float-start" alt="...">
+                        <img src="{{ asset($imageLicenseCarAttachment) }}" class="img-thumbnail rounded float-start"
+                            style="width:200px;height:200px;" alt="...">
                     </div>
                 </div>
             </div>

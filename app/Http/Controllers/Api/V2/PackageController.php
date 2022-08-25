@@ -27,9 +27,249 @@ use Str;
 
 class PackageController extends Controller
 {
-
-
     use GeneralTrait;
+
+    /**
+     * Get All Packages Without Auth
+     */
+    public function getAll(Request $request)
+    {
+        $packages = Package::where('added_by', 'admin')
+            ->where("active", 1);
+
+        $customer_type = $request->customer_type;
+        if ($customer_type != null) {
+            $packages = $packages->where('customer_type', $customer_type);
+        }
+
+        $packages = $packages->latest()
+            ->paginate(10);
+
+        return new PackageCollection($packages);
+    }
+
+    /**
+     * Get All Packages Based On Auth
+     */
+    public function authGetAll(Request $request)
+    {
+        try {
+            $address = auth()->user()->addresses()->where('set_default', 1)->first();
+
+            $packages = Package::where('added_by', 'admin')
+                ->where("active", 1)
+                ->where('customer_type', auth()->user()->customer_type)
+                ->whereHas('states', function ($q) use ($address) {
+                    $q->where("states.id", $address->state_id);
+                })
+                ->latest()
+                ->paginate(10);
+
+            return new PackageCollection($packages);
+        } catch (\Exception $e) {
+            return response()->json([
+                'result'  => false,
+                'message' => translate('Oops...')
+            ]);
+        }
+    }
+
+    /**
+     * Get Package Detail
+     */
+    public function getPackage(Request $request, $id)
+    {
+        try {
+            $package = Package::findOrFail($id);
+
+            $products = $package->products;
+            $productsData = [];
+            foreach ($products as $product) {
+                $productsData[] = [
+                    'id' => $product->id,
+                    'name' => $product->getTranslation('name'),
+                    'price' => format_price($product->unit_price),
+                    'qty' => $product->pivot->qty
+                ];
+            }
+
+            return response()->json([
+                'result' => true,
+                'data' => [
+                    'id'            => $package->id,
+                    'name'          => $package->getTranslation('name'),
+                    'desc'          => $package->getTranslation('desc'),
+                    'customer_type' => $package->customer_type,
+                    'price'         => ceil($package->price),
+                    'show_price'    => format_price(convert_price($package->price)),
+                    'qty'           => $package->package_items ? $package->package_items->sum('qty') : 0,
+                    'shipping_type' => $package->shipping_type,
+                    'duration'      => $package->duration,
+                    'visits_num'    => $package->visits_num,
+                    'states'        => $package->states,
+                    'products'      => $productsData
+                ]
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'result'  => false,
+                'message' => translate('Oops...')
+            ]);
+        }
+    }
+
+    /**
+     * Subscribe Package
+     */
+    public function subscribe(Request $request)
+    {
+        try {
+            $validate = Validator($request->all(), [
+                'package_id' => "required|integer",
+                'days'       => "required|string|max: 255",
+                'times'      => "required|string|max: 255",
+            ]);
+
+            if ($validate->fails()) {
+                $code = $this->returnCodeAccordingToInput($validate);
+                return $this->returnValidationError($code, $validate);
+            }
+
+            /**
+             * Check if user can subscribe or not
+             */
+            $address = auth()->user()->addresses()->where('set_default', 1)->first();
+            $package = Package::where("id", $request->package_id)
+                ->where('added_by', 'admin')
+                ->where("active", 1)
+                ->where('customer_type', auth()->user()->customer_type)
+                ->whereHas('states', function ($q) use ($address) {
+                    $q->where("states.id", $address->state_id);
+                })
+                ->first();
+            if ($package == null) {
+                return response()->json(
+                    [
+                        'status' => false,
+                        'message' => translate('You can\'t subscribe this Package.')
+                    ]
+                );
+            }
+
+            $days = explode(",", $request->days);
+            $times = explode(",", $request->times);
+            foreach ($days as $key => $day_id) {
+                $day = WeekDays::find($day_id);
+                if (!$day) {
+                    return response()->json(
+                        [
+                            'result' => false,
+                            'message' => translate('Please enter correct day.')
+                        ]
+                    );
+                }
+                if ($day->active == 0) {
+                    return response()->json(
+                        [
+                            'result' => false,
+                            'message' => translate('This day not available for shipping.')
+                        ]
+                    );
+                }
+            }
+
+            $user_package = UserPackage::where('package_id', $request->package_id)
+                ->where('user_id', auth()->user()->id)
+                ->where('is_active', 1)
+                ->first();
+            if (isset($user_package)) {
+                return response()->json(
+                    [
+                        'status' => false,
+                        'message' => translate('You already subscribed on this Package.')
+                    ]
+                );
+            }
+
+            if (count(array_filter($days, function ($x) {
+                return ($x !== "");
+            })) != count(array_filter($times, function ($x) {
+                return ($x !== "");
+            }))) {
+                return response()->json(
+                    [
+                        'status' => false,
+                        'message' => translate('Number of Days don\'t Match Number of Times.')
+                    ]
+                );
+            }
+
+            $new_user_package = new UserPackage();
+            $new_user_package->package_id       = $request->package_id;
+            $new_user_package->user_id          = auth()->user()->id;
+            $new_user_package->start_date       = Carbon::now()->toDateString();
+            $new_user_package->end_date         = Carbon::now()->addMonth($package->duration)->toDateString();
+            $new_user_package->remaining_visits = $package->visits_num;
+            $new_user_package->days             = $request->days;
+            $new_user_package->times            = $request->times;
+            $new_user_package->is_active        = 1;
+            $new_user_package->payment_status   = 'unpaid';
+            $new_user_package->save();
+
+            return response()->json(
+                [
+                    'result'          => true,
+                    'message'         => translate('You subscribe on this Package.'),
+                    'user_package_id' => $new_user_package->id
+                ]
+            );
+        } catch (\Exception $e) {
+            return response()->json(
+                [
+                    'result' => false,
+                    'message' => translate('This package does not exist.')
+                ]
+            );
+        }
+    }
+
+    public function mySubscribed()
+    {
+        try {
+            $user_packages = auth()->user()->user_packages;
+
+            $packagesData = [];
+            foreach ($user_packages as $user_package) {
+                $packagesData[] = [
+                    'id'               => $user_package->package->id,
+                    'name'             => $user_package->package->getTranslation('name'),
+                    'price'            => format_price($user_package->package->price),
+                    'qty'              => $user_package->package->products ? $user_package->package->package_items->sum('qty') : 0,
+                    'start_date'       => $user_package->start_date,
+                    'end_date'         => $user_package->end_date,
+                    'remaining_visits' => $user_package->remaining_visits,
+                    'days'             => $user_package->days,
+                    'times'            => $user_package->times,
+                    'is_active'        => $user_package->is_active,
+                    'payment_status'   => $user_package->payment_status,
+                ];
+            }
+
+            return response()->json(
+                [
+                    'result' => true,
+                    'data'   => $packagesData
+                ]
+            );
+        } catch (\Exception $e) {
+            return response()->json(
+                [
+                    'result' => false,
+                    'message' => translate('This package does not exist.')
+                ]
+            );
+        }
+    }
 
     /**
      * Display a listing of the resource.
@@ -435,7 +675,7 @@ class PackageController extends Controller
                     return $this->returnError('404', 'Package not Found.');
                     // return response()->json(['result' => false, 'message' => 'Package Item not Found'], 404);
                 }
-// return $package_item->package;
+                // return $package_item->package;
                 if ($package_item->package->user_id != auth()->user()->id) {
                     return $this->returnError('404', 'Package Item not Found.');
                     // return response()->json(['result' => false, 'message' => 'Package Item not Found'], 404);
@@ -478,7 +718,7 @@ class PackageController extends Controller
         if (isset($item)) {
             if ($item->package->user_id == auth()->user()->id) {
                 return response()->json([
-                    'result'=> false,
+                    'result' => false,
                     'message' => 'This item already exists in your package',
                     'item_id' => (int)$item->id,
                     'status' => '301'
@@ -508,7 +748,7 @@ class PackageController extends Controller
         // $package_translation->save();
 
         return response()->json([
-            'result'=> true,
+            'result' => true,
             'message' => 'Package Item Added',
             'package_item_id' => (int)$package_item->id,
             'package_item' => $package_item,
@@ -528,7 +768,7 @@ class PackageController extends Controller
         } else {
 
             $package = Package::find($item->package_id);
-            if (! $package) {
+            if (!$package) {
                 return $this->returnError('404', 'Package not Found.');
             }
 

@@ -9,25 +9,29 @@ class PackageDetailCollection extends ResourceCollection
     public function toArray($request)
     {
         return [
-            
-                    'id' => $this->id,
-                    'name' => $this->getTranslation('name'),
-                    'desc' => $this->getTranslation('desc'),
-                    'user_type' => $this->user_type,
-                    'user_id' => $this->user_id,
-                    'price' => $this->price,
-                    'qty' => $this->qty,
-                    'created_at' => $this->created_at,
-                    'package_items' => $this->package_items,
-
+            'data' => $this->collection->map(function ($data) {
+                return [
+                    'id'            => $data->id,
+                    'name'          => $data->getTranslation('name'),
+                    'desc'          => $data->getTranslation('desc'),
+                    'customer_type' => $data->customer_type,
+                    'price'         => ceil($data->price),
+                    'show_price'    => format_price(convert_price($data->price)),
+                    'qty'           => $data->package_items ? $data->package_items->sum('qty') : 0,
+                    'shipping_type' => $data->shipping_type,
+                    'duration'      => $data->duration,
+                    'visits_num'    => $data->visits_num,
+                    'states'        => $data->states,
+                    'products'      => $data->products
+                ];
+            })
         ];
     }
 
     public function with($request)
     {
         return [
-            'success' => true,
-            'status' => 200
+            'result' => true
         ];
     }
 }

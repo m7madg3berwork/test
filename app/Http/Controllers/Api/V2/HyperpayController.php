@@ -8,6 +8,7 @@ use App\Models\ComparisonProducts;
 use App\Models\Order;
 use App\Models\Wishlist;
 use App\Models\Product;
+use App\Models\UserPackage;
 use App\Traits\GeneralTrait;
 use Illuminate\Http\Request;
 
@@ -15,6 +16,115 @@ class HyperpayController extends Controller
 {
 
     use GeneralTrait;
+
+    /**
+     * Get Package Checkout ID
+     */
+    public function getPackageCheckoutId($id)
+    {
+        try {
+            $user_package = UserPackage::findOrFail($id);
+
+            $total = $user_package->package->price;
+
+            $url = config('payment.hyperpay.url') . "/v1/checkouts";
+            $data = "entityId=" . config('payment.hyperpay.entity_id') . "&amount=" . $total . "&currency=EUR" . "&paymentType=DB";
+            $ch = curl_init();
+            curl_setopt($ch, CURLOPT_URL, $url);
+            curl_setopt($ch, CURLOPT_HTTPHEADER, array(
+                'Authorization:Bearer ' . config('payment.hyperpay.auth_key')
+            ));
+            curl_setopt($ch, CURLOPT_POST, 1);
+            curl_setopt($ch, CURLOPT_POSTFIELDS, $data);
+            curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, config('payment.hyperpay.production'));
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+            $responseData = curl_exec($ch);
+            if (curl_errno($ch)) {
+                return curl_error($ch);
+            }
+            curl_close($ch);
+            $res = json_decode($responseData, true);
+
+            return response()->json([
+                'status'      => true,
+                'data'        => $res,
+                'total_price' => $total,
+                'checkout_id' => $res['id'],
+            ]);
+        } catch (\Exception $e) {
+            return response()->json(
+                [
+                    'result' => false,
+                    'message' => translate('Oops...')
+                ]
+            );
+        }
+    }
+    public function getPackagePaymentStatus(Request $request)
+    {
+        try {
+            $validate = Validator($request->all(), [
+                'resource_path'   => "required|string",
+                'user_package_id' => "required",
+            ]);
+
+            if ($validate->fails()) {
+                $code = $this->returnCodeAccordingToInput($validate);
+                return $this->returnValidationError($code, $validate);
+            }
+
+            $user_package = UserPackage::findOrFail($request->user_package_id);
+
+            $url = config('payment.hyperpay.url');
+            $url .= $request->resource_path;
+            $url .= "?entityId=" . config('payment.hyperpay.entity_id');
+            $ch = curl_init();
+            curl_setopt($ch, CURLOPT_URL, $url);
+            curl_setopt($ch, CURLOPT_HTTPHEADER, array(
+                'Authorization:Bearer ' . config('payment.hyperpay.auth_key')
+            ));
+            curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'GET');
+            curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, config('payment.hyperpay.production'));
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+            $responseData = curl_exec($ch);
+            if (curl_errno($ch)) {
+                return curl_error($ch);
+            }
+            curl_close($ch);
+
+            $res = json_decode($responseData, true);
+
+            //if the payment was done:
+            if ($res['result']['code'] == "000.100.110") {
+
+                // update package status
+                $user_package->payment_status = 'paid';
+                $user_package->save();
+
+                return response()->json([
+                    'status'         => true,
+                    'msg'            => translate('Payment Succeeded with Updating Package information'),
+                    'transaction_id' => $res['id'],
+                    'data'           => $res
+                ]);
+            }
+
+            return response()->json(
+                [
+                    'status' => true,
+                    'msg' => translate('Payment Failed'),
+                    'data' => $res
+                ]
+            );
+        } catch (\Exception $e) {
+            return response()->json(
+                [
+                    'result' => false,
+                    'message' => translate('Oops...')
+                ]
+            );
+        }
+    }
 
     public function getCheckoutId()
     {
@@ -103,7 +213,7 @@ class HyperpayController extends Controller
         foreach ($orders_ids_arr as $key => $order_id) {
             $order = Order::find($order_id);
             if (!$order) {
-                return $this->returnError('404', "No order with id = " . $order_id );
+                return $this->returnError('404', "No order with id = " . $order_id);
             }
         }
 

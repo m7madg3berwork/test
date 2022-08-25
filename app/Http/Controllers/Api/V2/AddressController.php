@@ -108,15 +108,29 @@ class AddressController extends Controller
 
     public function makeShippingAddressDefault(Request $request)
     {
-        Address::where('user_id', auth()->user()->id)->update(['set_default' => 0]); //make all user addressed non default first
+        try {
+            //make all user addressed non default first
+            Address::where('user_id', auth()->user()->id)
+                ->update(
+                    [
+                        'set_default' => 0
+                    ]
+                );
 
-        $address = Address::find($request->id);
-        $address->set_default = 1;
-        $address->save();
-        return response()->json([
-            'result' => true,
-            'message' => translate('Default shipping information has been updated')
-        ]);
+            $address = Address::findOrFail($request->address_id);
+            $address->set_default = 1;
+            $address->save();
+
+            return response()->json([
+                'result' => true,
+                'message' => translate('Default shipping information has been updated')
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'result' => false,
+                'message' => translate('Oops...')
+            ]);
+        }
     }
 
     public function updateAddressInCart(Request $request)

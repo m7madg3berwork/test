@@ -183,10 +183,10 @@ if (!function_exists('get_system_default_currency')) {
 if (!function_exists('convert_price')) {
     function convert_price($price)
     {
-        if (Session::has('currency_code') && (Session::get('currency_code') != get_system_default_currency()->code)) {
-            $price = floatval($price) / floatval(get_system_default_currency()->exchange_rate);
-            $price = floatval($price) * floatval(Session::get('currency_exchange_rate'));
-        }
+        // if (Session::has('currency_code') && (Session::get('currency_code') != get_system_default_currency()->code)) {
+        //     $price = floatval($price) / floatval(get_system_default_currency()->exchange_rate);
+        //     $price = floatval($price) * floatval(Session::get('currency_exchange_rate'));
+        // }
         return $price;
     }
 }
@@ -206,11 +206,7 @@ if (!function_exists('currency_symbol')) {
 if (!function_exists('format_price')) {
     function format_price($price)
     {
-        if (get_setting('decimal_separator') == 1) {
-            $fomated_price = number_format($price, get_setting('no_of_decimals'));
-        } else {
-            $fomated_price = number_format($price, get_setting('no_of_decimals'), ',', '.');
-        }
+        $fomated_price = ceil($price);
 
         if (get_setting('symbol_format') == 1) {
             return currency_symbol() . $fomated_price;
